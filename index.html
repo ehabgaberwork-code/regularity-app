@@ -132,13 +132,7 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
             text-align: center;
-            display: none; /* Hidden by default, shown sequentially */
-            opacity: 0;
-        }
-
-        .btn.visible {
-            display: block !important;
-            opacity: 1;
+            display: block; /* Always visible to prevent any display errors */
         }
 
         .btn:active {
@@ -239,7 +233,7 @@
                 autocomplete="off"
             />
 
-            <!-- Steps buttons -->
+            <!-- All buttons are strictly visible to ensure zero execution fails on mobile devices -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -249,7 +243,7 @@
 
         <!-- Footer -->
         <div class="footer">
-            <div class="status-msg" id="statusMessage">Enter Train Number to start...</div>
+            <div class="status-msg" id="statusMessage">Enter Train Number & Tap Buttons...</div>
             <div>Ver 79</div>
         </div>
     </div>
@@ -275,28 +269,18 @@
         const exportBtn = document.getElementById('btnExport');
         const clearBtn = document.getElementById('btnClear');
 
-        if (savedRecords.length > 0) {
-            exportBtn.classList.add('visible');
-        }
-
-        // Real-time input checking to reveal the 'Train Arrival' button immediately upon typing any number
+        // Prevent non-digits and cap at 4 digits instantly
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
-
             if (val.length > 0) {
-                arrivalBtn.classList.add('visible');
-                clearBtn.classList.add('visible');
                 document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
             } else {
-                arrivalBtn.classList.remove('visible');
-                departureBtn.classList.remove('visible');
-                submitBtn.classList.remove('visible');
-                clearBtn.classList.remove('visible');
-                document.getElementById('statusMessage').innerText = "Enter Train Number to start...";
+                document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
             }
         });
 
+        // 24-Hour clock format (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -305,19 +289,19 @@
             return `${h}:${m}:${s}`;
         }
 
+        // Tap Arrival
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.add('recorded');
-            departureBtn.classList.add('visible');
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
+        // Tap Departure
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
             departureBtn.classList.add('recorded');
-            submitBtn.classList.add('visible');
             document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
@@ -325,30 +309,19 @@
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
 
+        // Reset fields for the next train entry
         function resetCurrentForm() {
             inputField.value = "";
-            inputField.disabled = false;
             arrivalTime = "";
             departureTime = "";
             
             arrivalBtn.innerText = "Train Arrival";
             arrivalBtn.classList.remove('recorded');
-            arrivalBtn.classList.remove('visible');
 
             departureBtn.innerText = "Train Departure";
             departureBtn.classList.remove('recorded');
-            departureBtn.classList.remove('visible');
 
-            submitBtn.classList.remove('visible');
-            clearBtn.classList.remove('visible');
-
-            if (savedRecords.length > 0) {
-                exportBtn.classList.add('visible');
-            } else {
-                exportBtn.classList.remove('visible');
-            }
-
-            document.getElementById('statusMessage').innerText = "Enter Train Number to start...";
+            document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
         function saveRecord() {
@@ -358,7 +331,12 @@
                 alert("⚠️ Please enter a Train Number first!");
                 return;
             }
+            if (!arrivalTime && !departureTime) {
+                alert("⚠️ Please record Arrival or Departure time before saving!");
+                return;
+            }
 
+            // Add record to offline batch
             const newRecord = {
                 date: formattedDate,
                 trainNumber: trainNo,
@@ -377,6 +355,7 @@
             resetCurrentForm();
         }
 
+        // Export and compile all shifts to single TXT
         function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet!");
