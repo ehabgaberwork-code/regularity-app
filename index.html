@@ -35,7 +35,6 @@
             justify-content: space-between;
             box-sizing: border-box;
             position: relative;
-            background-color: var(--bg-color);
         }
 
         .header {
@@ -83,20 +82,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 35px;
+            margin-top: 45px;
             flex-grow: 1;
             justify-content: center;
-            gap: 16px;
+            gap: 14px;
             width: 100%;
         }
 
         .section-title {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: bold;
             margin: 0 0 5px 0;
         }
 
-        /* حقل إدخال رقم القطار - كيبورد أرقام فقط */
+        /* حقل إدخال رقم القطار - يفتح كيبورد الأرقام فقط */
         .input-field {
             width: 100%;
             padding: 14px;
@@ -109,6 +108,13 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
+            -moz-appearance: textfield;
+        }
+
+        .input-field::-webkit-outer-spin-button,
+        .input-field::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .input-field::placeholder {
@@ -118,20 +124,27 @@
             font-weight: normal;
         }
 
-        /* أزرار التسجيل */
+        /* حاوية الزر ومربع عرض الوقت */
+        .action-block {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
         .btn {
-            width: 85%;
+            width: 80%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: none;
             border-radius: 6px;
-            padding: 16px 0;
-            font-size: 20px;
+            padding: 15px 0;
+            font-size: 19px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
-            text-align: center;
         }
 
         .btn:active {
@@ -139,29 +152,37 @@
             background-color: #e0f2f1;
         }
 
-        .btn.recorded {
-            background-color: #e8f5e9;
-            color: #1b5e20;
-            border: 2px solid #81c784;
+        /* مربع إظهار التوقيت بصيغة 24 ساعة */
+        .time-badge {
+            width: 80%;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px dashed rgba(255, 255, 255, 0.5);
+            border-radius: 4px;
+            padding: 6px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffffff;
+            min-height: 22px;
+            letter-spacing: 1px;
+            box-sizing: border-box;
+        }
+
+        .time-badge.active {
+            background: #ffffff;
+            color: #004d66;
+            border: 1px solid #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 5px;
+            margin-top: 8px;
         }
 
         .btn-submit:active {
             background-color: #1b5e20;
-        }
-
-        .btn-export {
-            background-color: #f57c00;
-            color: #ffffff;
-        }
-
-        .btn-export:active {
-            background-color: #e65100;
         }
 
         .btn-clear {
@@ -171,16 +192,6 @@
 
         .btn-clear:active {
             background-color: #8e0000;
-        }
-
-        .counter-badge {
-            background: rgba(0, 0, 0, 0.25);
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: bold;
-            color: #ffd54f;
-            margin-bottom: 5px;
         }
 
         .footer {
@@ -201,7 +212,7 @@
 </head>
 <body>
 
-    <div class="container" id="appCard">
+    <div class="container">
         <!-- Header -->
         <div class="header">
             <button class="back-button" onclick="history.back()">
@@ -219,32 +230,35 @@
         <div class="content">
             <h1 class="section-title">Train Number</h1>
             
-            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
-
-            <!-- حقل الأرقام فقط بدون أي تعارض -->
+            <!-- حقل إدخال رقم القطار: يفتح Numpad فقط ويمنع الحروف تماماً ومحدد بـ 4 أرقام -->
             <input 
-                type="text" 
+                type="tel" 
                 id="trainNumber" 
                 class="input-field" 
                 placeholder="Enter Train Number" 
+                maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*"
-                maxlength="4"
                 autocomplete="off"
+                onkeypress="return isOnlyDigit(event)"
+                oninput="sanitizeInput(this)" 
             />
 
-            <!-- أزرار تسجيل وكتابة التوقيت بداخلها مباشرة -->
-            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
-            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+            <!-- بلوك وقت الوصول -->
+            <div class="action-block">
+                <button class="btn" id="btnArrival" onclick="recordArrival()">Train Arrival</button>
+                <div class="time-badge" id="arrivalBadge">Arrival: --:--:--</div>
+            </div>
 
-            <!-- زر الحفظ وتنزيل لقطة الشاشة -->
-            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecordAndDownloadScreenshot()">📸 💾 Submit & Screenshot</button>
-            
-            <!-- زر تصدير وتنزيل ملف TXT موحد -->
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
-            
-            <!-- زر مسح الحقول الحالية -->
-            <button class="btn btn-clear" type="button" onclick="resetCurrentForm()">Clear Current Form</button>
+            <!-- بلوك وقت المغادرة -->
+            <div class="action-block">
+                <button class="btn" id="btnDeparture" onclick="recordDeparture()">Train Departure</button>
+                <div class="time-badge" id="departureBadge">Departure: --:--:--</div>
+            </div>
+
+            <!-- أزرار الإرسال والمسح -->
+            <button class="btn btn-submit" id="btnSubmit" onclick="submitToSharePoint()">Send to SharePoint</button>
+            <button class="btn btn-clear" onclick="resetFields()">Clear Fields</button>
         </div>
 
         <!-- Footer -->
@@ -255,77 +269,119 @@
     </div>
 
     <script>
-        // ضبط تاريخ اليوم
+        // إظهار تاريخ اليوم تلقائياً
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
 
         let arrivalTime = "";
         let departureTime = "";
-        
-        // استرجاع السجلات السابقة من ذاكرة الهاتف
-        let savedRecords = [];
-        try {
-            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
-        } catch(e) { savedRecords = []; }
-        updateCounter();
 
-        // 1. معالجة كتابة الأرقام فقط وبحد أقصى 4 أرقام
-        const inputField = document.getElementById('trainNumber');
-        inputField.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
-        });
-
-        // 2. دالة حساب التوقيت بنظام 24 ساعة
+        // دالة حصرية لحساب التوقيت بنظام 24 ساعة بدقة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            return `${h}:${m}:${s}`;
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
         }
 
-        // 3. تسجيل وقت الوصول وكتابته داخل الزر
-        function handleArrival() {
+        // 1. منع الضغط على أي زر غير رقمي (0-9 فقط)
+        function isOnlyDigit(evt) {
+            const charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode < 48 || charCode > 57) {
+                return false;
+            }
+            return true;
+        }
+
+        // 2. تنظيف الإدخال فورياً وحذف أي حروف أو رموز وقصر الطول على 4 أرقام
+        function sanitizeInput(input) {
+            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+        }
+
+        // 3. تسجيل وعرض وقت الوصول بنظام 24 ساعة
+        function recordArrival() {
             arrivalTime = get24HourTime();
-            const btn = document.getElementById('btnArrival');
-            btn.innerText = "Arrival: " + arrivalTime;
-            btn.classList.add('recorded');
+            const badge = document.getElementById('arrivalBadge');
+            badge.innerText = "Arrival: " + arrivalTime;
+            badge.classList.add('active');
             document.getElementById('statusMessage').innerText = "Arrival recorded at " + arrivalTime;
         }
 
-        // 4. تسجيل وقت المغادرة وكتابته داخل الزر
-        function handleDeparture() {
+        // 4. تسجيل وعرض وقت المغادرة بنظام 24 ساعة
+        function recordDeparture() {
             departureTime = get24HourTime();
-            const btn = document.getElementById('btnDeparture');
-            btn.innerText = "Departure: " + departureTime;
-            btn.classList.add('recorded');
+            const badge = document.getElementById('departureBadge');
+            badge.innerText = "Departure: " + departureTime;
+            badge.classList.add('active');
             document.getElementById('statusMessage').innerText = "Departure recorded at " + departureTime;
         }
 
-        function updateCounter() {
-            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
-        }
-
-        // 5. مسح الحقول للقطار التالي
-        function resetCurrentForm() {
+        // 5. مسح الحقول وإعادة التهيئة
+        function resetFields() {
             document.getElementById('trainNumber').value = "";
             arrivalTime = "";
             departureTime = "";
             
-            const arrBtn = document.getElementById('btnArrival');
-            arrBtn.innerText = "Train Arrival";
-            arrBtn.classList.remove('recorded');
+            const arrBadge = document.getElementById('arrivalBadge');
+            arrBadge.innerText = "Arrival: --:--:--";
+            arrBadge.classList.remove('active');
 
-            const depBtn = document.getElementById('btnDeparture');
-            depBtn.innerText = "Train Departure";
-            depBtn.classList.remove('recorded');
+            const depBadge = document.getElementById('departureBadge');
+            depBadge.innerText = "Departure: --:--:--";
+            depBadge.classList.remove('active');
 
-            document.getElementById('statusMessage').innerText = "Ready for next train.";
+            document.getElementById('statusMessage').innerText = "Fields reset.";
         }
 
-        // 6. توليد صورة لقطة الشاشة برمجياً وتنزيلها تلقائياً (Native Canvas Renderer)
-        function generateAndDownloadImage(trainNo, dateText, arrText, depText) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 600;
-         
+        // 6. إرسال البيانات إلى شير بوينت عبر Power Automate
+        async function submitToSharePoint() {
+            const trainNo = document.getElementById('trainNumber').value.trim();
+
+            if (!trainNo) {
+                alert("⚠️ Please enter the Train Number first!");
+                return;
+            }
+            if (!arrivalTime && !departureTime) {
+                alert("⚠️ Please record Arrival or Departure time before sending!");
+                return;
+            }
+
+            // ضع هنا رابط Webhook الخاص بك من Power Automate
+            const powerAutomateUrl = "YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE";
+
+            const payload = {
+                title: trainNo,
+                date: formattedDate,
+                trainNumber: trainNo,
+                trainArrival: arrivalTime || "",
+                trainDeparture: departureTime || ""
+            };
+
+            document.getElementById('statusMessage').innerText = "Sending to SharePoint...";
+
+            try {
+                const response = await fetch(powerAutomateUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ Data recorded in SharePoint successfully!");
+                    document.getElementById('statusMessage').innerText = "Saved successfully!";
+                    resetFields();
+                } else {
+                    alert("❌ Error sending data. Please verify your Power Automate Flow status.");
+                    document.getElementById('statusMessage').innerText = "Failed to send.";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("⚠️ Could not connect. Please ensure your Power Automate URL is configured.");
+                document.getElementById('statusMessage').innerText = "Connection error.";
+            }
+        }
+    </script>
+</body>
+</html>
