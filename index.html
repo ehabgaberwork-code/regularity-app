@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regularity Measurement</title>
+    <style>
+        :root {
+            --bg-color: #005a79;
+            --text-color: #ffffff;
+            --btn-bg: #ffffff;
+            --btn-text: #004d66;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 412px;
+            height: 100vh;
+            max-height: 850px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-button svg {
+            width: 40px;
+            height: 40px;
+            fill: none;
+            stroke: #ffffff;
+            stroke-width: 2;
+        }
+
+        .header-title {
+            font-size: 22px;
+            font-weight: bold;
+            flex-grow: 1;
+            text-align: left;
+            margin-left: 15px;
+        }
+
+        .date-display {
+            position: absolute;
+            top: 75px;
+            right: 24px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 60px;
+            flex-grow: 1;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .section-title {
+            font-size: 34px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            text-align: center;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #333333;
+        }
+
+        .input-field::placeholder {
+            color: #8c9ba5;
+            font-size: 18px;
+        }
+
+        .btn {
+            width: 75%;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            border-radius: 4px;
+            padding: 18px 0;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s ease, background-color 0.2s;
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+            background-color: #f0f0f0;
+        }
+
+        .btn-submit {
+            background-color: #2e7d32;
+            color: #ffffff;
+        }
+
+        .btn-submit:active {
+            background-color: #1b5e20;
+        }
+
+        .btn-clear {
+            background-color: #c62828;
+            color: #ffffff;
+        }
+
+        .btn-clear:active {
+            background-color: #8e0000;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 10px;
+        }
+
+        .status-msg {
+            font-size: 13px;
+            color: #ffd54f;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-button" onclick="history.back()">
+                <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
+                    <path d="M14 8l-4 4 4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="header-title">Regularity Measurement</div>
+        </div>
+
+        <div class="date-display" id="currentDate"></div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h1 class="section-title">Train Number</h1>
+            <input type="text" id="trainNumber" class="input-field" placeholder="Please Enter the Train Number" />
+
+            <!-- Buttons -->
+            <button class="btn" id="btnArrival" onclick="recordArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" onclick="recordDeparture()">Train Departure</button>
+            <button class="btn btn-submit" id="btnSubmit" onclick="submitToSharePoint()">Send to SharePoint</button>
+            <button class="btn btn-clear" onclick="resetFields()">Clear Fields</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="status-msg" id="statusMessage">Ready to record...</div>
+            <div>Ver 79</div>
+        </div>
+    </div>
+
+    <script>
+        // Automatic dynamic date formatted as M/D/YYYY
+        const today = new Date();
+        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+        document.getElementById('currentDate').innerText = formattedDate;
+
+        let arrivalTime = "";
+        let departureTime = "";
+
+        // Record current local time for Train Arrival
+        function recordArrival() {
+            const now = new Date();
+            arrivalTime = now.toLocaleTimeString();
+            document.getElementById('btnArrival').innerText = "Arrival: " + arrivalTime;
+            document.getElementById('statusMessage').innerText = "Recorded Arrival at " + arrivalTime;
+        }
+
+        // Record current local time for Train Departure
+        function recordDeparture() {
+            const now = new Date();
+            departureTime = now.toLocaleTimeString();
+            document.getElementById('btnDeparture').innerText = "Departure: " + departureTime;
+            document.getElementById('statusMessage').innerText = "Recorded Departure at " + departureTime;
+        }
+
+        // Reset all input fields and recorded times
+        function resetFields() {
+            document.getElementById('trainNumber').value = "";
+            arrivalTime = "";
+            departureTime = "";
+            document.getElementById('btnArrival').innerText = "Train Arrival";
+            document.getElementById('btnDeparture').innerText = "Train Departure";
+            document.getElementById('statusMessage').innerText = "Fields reset.";
+        }
+
+        // Send captured data to SharePoint List via Power Automate HTTP Webhook
+        async function submitToSharePoint() {
+            const trainNo = document.getElementById('trainNumber').value.trim();
+
+            if (!trainNo) {
+                alert("⚠️ Please enter the Train Number first!");
+                return;
+            }
+            if (!arrivalTime && !departureTime) {
+                alert("⚠️ Please record Arrival or Departure time before sending!");
+                return;
+            }
+
+            // ⬇️ Replace with your Power Automate HTTP POST URL ⬇️
+            const powerAutomateUrl = "YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE";
+
+            const payload = {
+                title: trainNo,
+                date: formattedDate,
+                trainNumber: trainNo,
+                trainArrival: arrivalTime || "",
+                trainDeparture: departureTime || ""
+            };
+
+            document.getElementById('statusMessage').innerText = "Sending to SharePoint...";
+
+            try {
+                const response = await fetch(powerAutomateUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    alert("✅ Data recorded in SharePoint successfully!");
+                    document.getElementById('statusMessage').innerText = "Saved successfully!";
+                    resetFields();
+                } else {
+                    alert("❌ Error sending data. Please verify your Power Automate Flow status.");
+                    document.getElementById('statusMessage').innerText = "Failed to send.";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("⚠️ Could not connect. Please ensure your Power Automate URL is configured.");
+                document.getElementById('statusMessage').innerText = "Connection error.";
+            }
+        }
+    </script>
+</body>
+</html>
