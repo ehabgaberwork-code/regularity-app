@@ -98,18 +98,22 @@
         .input-field {
             width: 100%;
             padding: 16px;
-            font-size: 18px;
+            font-size: 20px;
             border: none;
             border-radius: 4px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
             color: #333333;
+            letter-spacing: 2px;
+            font-weight: bold;
         }
 
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 18px;
+            font-size: 17px;
+            letter-spacing: normal;
+            font-weight: normal;
         }
 
         .btn {
@@ -183,9 +187,19 @@
         <!-- Main Content -->
         <div class="content">
             <h1 class="section-title">Train Number</h1>
-            <input type="text" id="trainNumber" class="input-field" placeholder="Please Enter the Train Number" />
+            <!-- حقل الإدخال: أرقام فقط وبحد أقصى 4 أرقام -->
+            <input 
+                type="tel" 
+                id="trainNumber" 
+                class="input-field" 
+                placeholder="Enter Train Number (max 4 digits)" 
+                maxlength="4" 
+                inputmode="numeric" 
+                pattern="[0-9]*" 
+                oninput="validateNumber(this)" 
+            />
 
-            <!-- Buttons -->
+            <!-- الأزرار -->
             <button class="btn" id="btnArrival" onclick="recordArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" onclick="recordDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" onclick="submitToSharePoint()">Send to SharePoint</button>
@@ -200,7 +214,7 @@
     </div>
 
     <script>
-        // Automatic dynamic date formatted as M/D/YYYY
+        // دالة لعرض تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -208,23 +222,35 @@
         let arrivalTime = "";
         let departureTime = "";
 
-        // Record current local time for Train Arrival
-        function recordArrival() {
+        // دالة حصرية لجلب الوقت الحالي بصيغة 24 ساعة (HH:MM:SS)
+        function get24HourTime() {
             const now = new Date();
-            arrivalTime = now.toLocaleTimeString();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        }
+
+        // منع إدخال أي حروف والتأكد أن المدخل أرقام فقط وبحد أقصى 4 أرقام
+        function validateNumber(input) {
+            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+        }
+
+        // 1. تسجيل وقت الوصول (صيغة 24 ساعة)
+        function recordArrival() {
+            arrivalTime = get24HourTime();
             document.getElementById('btnArrival').innerText = "Arrival: " + arrivalTime;
             document.getElementById('statusMessage').innerText = "Recorded Arrival at " + arrivalTime;
         }
 
-        // Record current local time for Train Departure
+        // 2. تسجيل وقت المغادرة (صيغة 24 ساعة)
         function recordDeparture() {
-            const now = new Date();
-            departureTime = now.toLocaleTimeString();
+            departureTime = get24HourTime();
             document.getElementById('btnDeparture').innerText = "Departure: " + departureTime;
             document.getElementById('statusMessage').innerText = "Recorded Departure at " + departureTime;
         }
 
-        // Reset all input fields and recorded times
+        // 3. مسح الحقول وإعادة التهيئة
         function resetFields() {
             document.getElementById('trainNumber').value = "";
             arrivalTime = "";
@@ -234,7 +260,7 @@
             document.getElementById('statusMessage').innerText = "Fields reset.";
         }
 
-        // Send captured data to SharePoint List via Power Automate HTTP Webhook
+        // 4. إرسال البيانات إلى شير بوينت عبر Power Automate
         async function submitToSharePoint() {
             const trainNo = document.getElementById('trainNumber').value.trim();
 
@@ -247,7 +273,7 @@
                 return;
             }
 
-            // ⬇️ Replace with your Power Automate HTTP POST URL ⬇️
+            // ضع هنا رابط Webhook الخاص بـ Power Automate
             const powerAutomateUrl = "YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE";
 
             const payload = {
@@ -269,18 +295,4 @@
 
                 if (response.ok) {
                     alert("✅ Data recorded in SharePoint successfully!");
-                    document.getElementById('statusMessage').innerText = "Saved successfully!";
-                    resetFields();
-                } else {
-                    alert("❌ Error sending data. Please verify your Power Automate Flow status.");
-                    document.getElementById('statusMessage').innerText = "Failed to send.";
-                }
-            } catch (error) {
-                console.error(error);
-                alert("⚠️ Could not connect. Please ensure your Power Automate URL is configured.");
-                document.getElementById('statusMessage').innerText = "Connection error.";
-            }
-        }
-    </script>
-</body>
-</html>
+                    document.getElementById('statusMessage').innerText
