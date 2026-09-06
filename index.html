@@ -98,20 +98,20 @@
         .input-field {
             width: 100%;
             padding: 16px;
-            font-size: 20px;
+            font-size: 22px;
             border: none;
             border-radius: 4px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
             color: #333333;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-weight: bold;
         }
 
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 17px;
+            font-size: 16px;
             letter-spacing: normal;
             font-weight: normal;
         }
@@ -187,15 +187,16 @@
         <!-- Main Content -->
         <div class="content">
             <h1 class="section-title">Train Number</h1>
-            <!-- حقل الإدخال: أرقام فقط وبحد أقصى 4 أرقام -->
+            <!-- حقل الأرقام فقط: يمنع كتابة الحروف تماماً ومحدد بـ 4 أرقام -->
             <input 
-                type="tel" 
+                type="text" 
                 id="trainNumber" 
                 class="input-field" 
                 placeholder="Enter Train Number (max 4 digits)" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*" 
+                pattern="[0-9]*"
+                onkeypress="return isNumberKey(event)"
                 oninput="validateNumber(this)" 
             />
 
@@ -214,7 +215,7 @@
     </div>
 
     <script>
-        // دالة لعرض تاريخ اليوم
+        // عرض تاريخ اليوم تلقائياً
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -222,7 +223,7 @@
         let arrivalTime = "";
         let departureTime = "";
 
-        // دالة حصرية لجلب الوقت الحالي بصيغة 24 ساعة (HH:MM:SS)
+        // دالة حصرية لحساب التوقيت الحالي بنظام 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -231,26 +232,35 @@
             return `${hours}:${minutes}:${seconds}`;
         }
 
-        // منع إدخال أي حروف والتأكد أن المدخل أرقام فقط وبحد أقصى 4 أرقام
-        function validateNumber(input) {
-            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
+        // 1. منع كتابة أي حرف أثناء الضغط على المفاتيح (Keypress)
+        function isNumberKey(evt) {
+            const charCode = (evt.which) ? evt.which : evt.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                return false;
+            }
+            return true;
         }
 
-        // 1. تسجيل وقت الوصول (صيغة 24 ساعة)
+        // 2. تنظيف الإدخال والتأكد من عدم لصق أي نصوص وبحد أقصى 4 أرقام
+        function validateNumber(input) {
+            input.value = input.value.replace(/\D/g, '').slice(0, 4);
+        }
+
+        // تسجيل وقت الوصول بنظام 24 ساعة
         function recordArrival() {
             arrivalTime = get24HourTime();
             document.getElementById('btnArrival').innerText = "Arrival: " + arrivalTime;
             document.getElementById('statusMessage').innerText = "Recorded Arrival at " + arrivalTime;
         }
 
-        // 2. تسجيل وقت المغادرة (صيغة 24 ساعة)
+        // تسجيل وقت المغادرة بنظام 24 ساعة
         function recordDeparture() {
             departureTime = get24HourTime();
             document.getElementById('btnDeparture').innerText = "Departure: " + departureTime;
             document.getElementById('statusMessage').innerText = "Recorded Departure at " + departureTime;
         }
 
-        // 3. مسح الحقول وإعادة التهيئة
+        // مسح الحقول وإعادة التهيئة
         function resetFields() {
             document.getElementById('trainNumber').value = "";
             arrivalTime = "";
@@ -260,7 +270,7 @@
             document.getElementById('statusMessage').innerText = "Fields reset.";
         }
 
-        // 4. إرسال البيانات إلى شير بوينت عبر Power Automate
+        // إرسال البيانات إلى شير بوينت عبر Power Automate
         async function submitToSharePoint() {
             const trainNo = document.getElementById('trainNumber').value.trim();
 
@@ -273,7 +283,7 @@
                 return;
             }
 
-            // ضع هنا رابط Webhook الخاص بـ Power Automate
+            // ضع هنا رابط Webhook الخاص بك من Power Automate
             const powerAutomateUrl = "YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE";
 
             const payload = {
@@ -295,4 +305,18 @@
 
                 if (response.ok) {
                     alert("✅ Data recorded in SharePoint successfully!");
-                    document.getElementById('statusMessage').innerText
+                    document.getElementById('statusMessage').innerText = "Saved successfully!";
+                    resetFields();
+                } else {
+                    alert("❌ Error sending data. Please verify your Power Automate Flow status.");
+                    document.getElementById('statusMessage').innerText = "Failed to send.";
+                }
+            } catch (error) {
+                console.error(error);
+                alert("⚠️ Could not connect. Please ensure your Power Automate URL is configured.");
+                document.getElementById('statusMessage').innerText = "Connection error.";
+            }
+        }
+    </script>
+</body>
+</html>
