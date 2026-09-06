@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- مكتبة التقاط لقطات الشاشة للشاشات المحمولة -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #005a79;
@@ -111,13 +109,6 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
-            -moz-appearance: textfield;
-        }
-
-        .input-field::-webkit-outer-spin-button,
-        .input-field::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
 
         .input-field::placeholder {
@@ -127,7 +118,7 @@
             font-weight: normal;
         }
 
-        /* أزرار التسجيل - يتم إظهار التوقيت بداخلها مباشرة */
+        /* أزرار التسجيل */
         .btn {
             width: 85%;
             background-color: var(--btn-bg);
@@ -148,7 +139,6 @@
             background-color: #e0f2f1;
         }
 
-        /* تنسيق مميز للأزرار بعد تسجيل التوقيت داخلها */
         .btn.recorded {
             background-color: #e8f5e9;
             color: #1b5e20;
@@ -211,7 +201,7 @@
 </head>
 <body>
 
-    <div class="container" id="captureArea">
+    <div class="container" id="appCard">
         <!-- Header -->
         <div class="header">
             <button class="back-button" onclick="history.back()">
@@ -231,32 +221,30 @@
             
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- حقل الأرقام فقط بحد أقصى 4 أرقام -->
+            <!-- حقل الأرقام فقط بدون أي تعارض -->
             <input 
-                type="tel" 
+                type="text" 
                 id="trainNumber" 
                 class="input-field" 
                 placeholder="Enter Train Number" 
-                maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*"
+                maxlength="4"
                 autocomplete="off"
-                onkeypress="return isOnlyDigit(event)"
-                oninput="sanitizeInput(this)" 
             />
 
             <!-- أزرار تسجيل وكتابة التوقيت بداخلها مباشرة -->
-            <button class="btn" id="btnArrival" onclick="recordArrival()">Train Arrival</button>
-            <button class="btn" id="btnDeparture" onclick="recordDeparture()">Train Departure</button>
+            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
 
-            <!-- زر الحفظ ولقطة الشاشة -->
-            <button class="btn btn-submit" id="btnSubmit" onclick="saveTrainRecordWithScreenshot()">📸 💾 Submit & Screenshot</button>
+            <!-- زر الحفظ وتنزيل لقطة الشاشة -->
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecordAndDownloadScreenshot()">📸 💾 Submit & Screenshot</button>
             
             <!-- زر تصدير وتنزيل ملف TXT موحد -->
-            <button class="btn btn-export" id="btnExport" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
             
             <!-- زر مسح الحقول الحالية -->
-            <button class="btn btn-clear" onclick="resetCurrentForm()">Clear Current Form</button>
+            <button class="btn btn-clear" type="button" onclick="resetCurrentForm()">Clear Current Form</button>
         </div>
 
         <!-- Footer -->
@@ -267,6 +255,7 @@
     </div>
 
     <script>
+        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -274,12 +263,69 @@
         let arrivalTime = "";
         let departureTime = "";
         
-        let savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        // استرجاع السجلات السابقة من ذاكرة الهاتف
+        let savedRecords = [];
+        try {
+            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        } catch(e) { savedRecords = []; }
         updateCounter();
 
-        // حساب التوقيت بنظام 24 ساعة بدقة (HH:MM:SS)
+        // 1. معالجة كتابة الأرقام فقط وبحد أقصى 4 أرقام
+        const inputField = document.getElementById('trainNumber');
+        inputField.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+        });
+
+        // 2. دالة حساب التوقيت بنظام 24 ساعة
         function get24HourTime() {
             const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStar
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return `${h}:${m}:${s}`;
+        }
+
+        // 3. تسجيل وقت الوصول وكتابته داخل الزر
+        function handleArrival() {
+            arrivalTime = get24HourTime();
+            const btn = document.getElementById('btnArrival');
+            btn.innerText = "Arrival: " + arrivalTime;
+            btn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = "Arrival recorded at " + arrivalTime;
+        }
+
+        // 4. تسجيل وقت المغادرة وكتابته داخل الزر
+        function handleDeparture() {
+            departureTime = get24HourTime();
+            const btn = document.getElementById('btnDeparture');
+            btn.innerText = "Departure: " + departureTime;
+            btn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = "Departure recorded at " + departureTime;
+        }
+
+        function updateCounter() {
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+        }
+
+        // 5. مسح الحقول للقطار التالي
+        function resetCurrentForm() {
+            document.getElementById('trainNumber').value = "";
+            arrivalTime = "";
+            departureTime = "";
+            
+            const arrBtn = document.getElementById('btnArrival');
+            arrBtn.innerText = "Train Arrival";
+            arrBtn.classList.remove('recorded');
+
+            const depBtn = document.getElementById('btnDeparture');
+            depBtn.innerText = "Train Departure";
+            depBtn.classList.remove('recorded');
+
+            document.getElementById('statusMessage').innerText = "Ready for next train.";
+        }
+
+        // 6. توليد صورة لقطة الشاشة برمجياً وتنزيلها تلقائياً (Native Canvas Renderer)
+        function generateAndDownloadImage(trainNo, dateText, arrText, depText) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 600;
+         
