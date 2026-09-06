@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- html2canvas library for capturing screenshots -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #005a79;
@@ -111,13 +109,6 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
-            -moz-appearance: textfield;
-        }
-
-        .input-field::-webkit-outer-spin-button,
-        .input-field::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
 
         .input-field::placeholder {
@@ -135,18 +126,18 @@
             border: none;
             border-radius: 6px;
             padding: 16px 0;
-            font-size: 19px;
+            font-size: 20px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             text-align: center;
             display: none; /* Hidden by default, shown sequentially */
             opacity: 0;
         }
 
         .btn.visible {
-            display: block;
+            display: block !important;
             opacity: 1;
         }
 
@@ -216,7 +207,7 @@
 </head>
 <body>
 
-    <div class="container" id="appCard">
+    <div class="container">
         <!-- Header -->
         <div class="header">
             <button class="back-button" onclick="history.back()">
@@ -251,14 +242,14 @@
             <!-- Steps buttons -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
-            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecordAndDownloadScreenshot()">📸 💾 Submit & Screenshot</button>
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
             <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Current Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="status-msg" id="statusMessage">Enter 4-digit Train Number to start...</div>
+            <div class="status-msg" id="statusMessage">Enter Train Number to start...</div>
             <div>Ver 79</div>
         </div>
     </div>
@@ -288,22 +279,21 @@
             exportBtn.classList.add('visible');
         }
 
-        // Real-time input checking to reveal the 'Train Arrival' button immediately upon typing 4 digits (e.g. 7071)
+        // Real-time input checking to reveal the 'Train Arrival' button immediately upon typing any number
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
 
-            if (val.length === 4) {
+            if (val.length > 0) {
                 arrivalBtn.classList.add('visible');
                 clearBtn.classList.add('visible');
-                inputField.blur(); // dismiss mobile keyboard automatically
-                document.getElementById('statusMessage').innerText = `Train ${val} set. Tap 'Train Arrival' next.`;
+                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
             } else {
                 arrivalBtn.classList.remove('visible');
                 departureBtn.classList.remove('visible');
                 submitBtn.classList.remove('visible');
                 clearBtn.classList.remove('visible');
-                document.getElementById('statusMessage').innerText = "Please enter 4 digits.";
+                document.getElementById('statusMessage').innerText = "Enter Train Number to start...";
             }
         });
 
@@ -328,7 +318,7 @@
             departureBtn.innerText = "Departure: " + departureTime;
             departureBtn.classList.add('recorded');
             submitBtn.classList.add('visible');
-            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Submit & Screenshot' to save.`;
+            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
         function updateCounter() {
@@ -358,91 +348,16 @@
                 exportBtn.classList.remove('visible');
             }
 
-            document.getElementById('statusMessage').innerText = "Enter train number to start...";
+            document.getElementById('statusMessage').innerText = "Enter Train Number to start...";
         }
 
-        function generateAndDownloadImage(trainNo, dateText, arrText, depText) {
-            const canvas = document.createElement('canvas');
-            canvas.width = 600;
-            canvas.height = 900;
-            const ctx = canvas.getContext('2d');
-
-            ctx.fillStyle = '#005a79';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.font = 'bold 30px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Regularity Measurement', 50, 80);
-
-            ctx.font = 'bold 26px sans-serif';
-            ctx.textAlign = 'right';
-            ctx.fillText(dateText, canvas.width - 50, 80);
-
-            ctx.textAlign = 'center';
-            ctx.font = 'bold 44px sans-serif';
-            ctx.fillText('Train Number', canvas.width / 2, 230);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.roundRect(80, 260, 440, 90, [10]);
-            ctx.fill();
-
-            ctx.fillStyle = '#004d66';
-            ctx.font = 'bold 50px sans-serif';
-            ctx.fillText(trainNo, canvas.width / 2, 325);
-
-            ctx.fillStyle = arrText ? '#e8f5e9' : '#ffffff';
-            ctx.beginPath();
-            ctx.roundRect(80, 390, 440, 90, [10]);
-            ctx.fill();
-            if (arrText) {
-                ctx.strokeStyle = '#81c784';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-            }
-            ctx.fillStyle = arrText ? '#1b5e20' : '#004d66';
-            ctx.font = 'bold 34px sans-serif';
-            ctx.fillText(arrText ? 'Arrival: ' + arrText : 'Train Arrival', canvas.width / 2, 448);
-
-            ctx.fillStyle = depText ? '#e8f5e9' : '#ffffff';
-            ctx.beginPath();
-            ctx.roundRect(80, 520, 440, 90, [10]);
-            ctx.fill();
-            if (depText) {
-                ctx.strokeStyle = '#81c784';
-                ctx.lineWidth = 4;
-                ctx.stroke();
-            }
-            ctx.fillStyle = depText ? '#1b5e20' : '#004d66';
-            ctx.font = 'bold 34px sans-serif';
-            ctx.fillText(depText ? 'Departure: ' + depText : 'Train Departure', canvas.width / 2, 578);
-
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = '22px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText('Saved Record', 50, 840);
-            ctx.textAlign = 'right';
-            ctx.fillText('Ver 79', canvas.width - 50, 840);
-
-            const link = document.createElement('a');
-            const timeTag = get24HourTime().replace(/:/g, '-');
-            link.download = `Train_${trainNo}_${timeTag}.png`;
-            link.href = canvas.toDataURL('image/png');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        function saveRecordAndDownloadScreenshot() {
+        function saveRecord() {
             const trainNo = inputField.value.trim();
 
-            if (!trainNo || trainNo.length < 4) {
-                alert("⚠️ Please enter a valid 4-digit Train Number first!");
+            if (!trainNo) {
+                alert("⚠️ Please enter a Train Number first!");
                 return;
             }
-
-            generateAndDownloadImage(trainNo, formattedDate, arrivalTime, departureTime);
 
             const newRecord = {
                 date: formattedDate,
@@ -458,7 +373,7 @@
             } catch(e) {}
             
             updateCounter();
-            alert(`✅ Train ${trainNo} saved & Screenshot downloaded! Total saved: ${savedRecords.length}`);
+            alert(`✅ Train ${trainNo} saved locally! Total saved: ${savedRecords.length}`);
             resetCurrentForm();
         }
 
@@ -476,4 +391,32 @@
             fileContent += "----------------------------------------\\n";
 
             savedRecords.forEach((item) => {
-    
+                const trainFormatted = item.trainNumber.padEnd(8, ' ');
+                const dateFormatted = item.date.padEnd(10, ' ');
+                const arrFormatted = item.arrival.padEnd(8, ' ');
+                const depFormatted = item.departure.padEnd(8, ' ');
+                fileContent += `${trainFormatted} | ${dateFormatted} | ${arrFormatted} | ${depFormatted}\\n`;
+            });
+
+            fileContent += "\\n========================================\\n";
+
+            const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            const fileName = `Regularity_${formattedDate.replace(/\\//g, '-')}_AllTrains.txt`;
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            if (confirm("✅ TXT report downloaded successfully!\\n\\nDo you want to clear the saved list to start fresh?")) {
+                savedRecords = [];
+                localStorage.removeItem('train_records');
+                updateCounter();
+                resetCurrentForm();
+            }
+        }
+    </script>
+</body>
+</html>
