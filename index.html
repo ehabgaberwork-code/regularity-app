@@ -82,20 +82,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 45px;
+            margin-top: 35px;
             flex-grow: 1;
             justify-content: center;
-            gap: 14px;
+            gap: 12px;
             width: 100%;
         }
 
         .section-title {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: bold;
             margin: 0 0 5px 0;
         }
 
-        /* حقل إدخال رقم القطار - يفتح كيبورد الأرقام فقط */
+        /* حقل إدخال رقم القطار - كيبورد أرقام فقط */
         .input-field {
             width: 100%;
             padding: 14px;
@@ -124,7 +124,6 @@
             font-weight: normal;
         }
 
-        /* حاوية الزر ومربع عرض الوقت */
         .action-block {
             width: 100%;
             display: flex;
@@ -134,12 +133,12 @@
         }
 
         .btn {
-            width: 80%;
+            width: 85%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: none;
             border-radius: 6px;
-            padding: 15px 0;
+            padding: 14px 0;
             font-size: 19px;
             font-weight: bold;
             cursor: pointer;
@@ -152,18 +151,17 @@
             background-color: #e0f2f1;
         }
 
-        /* مربع إظهار التوقيت بصيغة 24 ساعة */
         .time-badge {
-            width: 80%;
+            width: 85%;
             background: rgba(255, 255, 255, 0.15);
             border: 1px dashed rgba(255, 255, 255, 0.5);
             border-radius: 4px;
             padding: 6px 0;
             text-align: center;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             color: #ffffff;
-            min-height: 22px;
+            min-height: 20px;
             letter-spacing: 1px;
             box-sizing: border-box;
         }
@@ -175,14 +173,25 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
+        /* زر حفظ القطار محلياً */
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 8px;
+            margin-top: 5px;
         }
 
         .btn-submit:active {
             background-color: #1b5e20;
+        }
+
+        /* زر تحميل وتصدير الملف النهائي */
+        .btn-export {
+            background-color: #f57c00;
+            color: #ffffff;
+        }
+
+        .btn-export:active {
+            background-color: #e65100;
         }
 
         .btn-clear {
@@ -192,6 +201,16 @@
 
         .btn-clear:active {
             background-color: #8e0000;
+        }
+
+        .counter-badge {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd54f;
+            margin-bottom: 5px;
         }
 
         .footer {
@@ -230,7 +249,10 @@
         <div class="content">
             <h1 class="section-title">Train Number</h1>
             
-            <!-- حقل إدخال رقم القطار: يفتح Numpad فقط ويمنع الحروف تماماً ومحدد بـ 4 أرقام -->
+            <!-- عداد القطارات المحفوظة -->
+            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+
+            <!-- حقل إدخال رقم القطار: أرقام فقط وبحد أقصى 4 أرقام -->
             <input 
                 type="tel" 
                 id="trainNumber" 
@@ -256,9 +278,14 @@
                 <div class="time-badge" id="departureBadge">Departure: --:--:--</div>
             </div>
 
-            <!-- أزرار الإرسال والمسح -->
-            <button class="btn btn-submit" id="btnSubmit" onclick="submitToSharePoint()">Send to SharePoint</button>
-            <button class="btn btn-clear" onclick="resetFields()">Clear Fields</button>
+            <!-- زر حفظ بيانات القطار الحالي وتجهيز الشاشة للقطار التالي -->
+            <button class="btn btn-submit" id="btnSubmit" onclick="saveTrainRecord()">💾 Submit (Save Train)</button>
+            
+            <!-- زر تحميل وتصدير كل القطارات في ملف TXT واحد -->
+            <button class="btn btn-export" id="btnExport" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
+            
+            <!-- زر مسح الإدخال الحالي أو تصفير القائمة -->
+            <button class="btn btn-clear" onclick="resetCurrentForm()">Clear Current Form</button>
         </div>
 
         <!-- Footer -->
@@ -269,15 +296,19 @@
     </div>
 
     <script>
-        // إظهار تاريخ اليوم تلقائياً
+        // إظهار تاريخ اليوم تلقائياً بصيغة M/D/YYYY
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
 
         let arrivalTime = "";
         let departureTime = "";
+        
+        // استرجاع السجلات المحفوظة مسبقاً من ذاكرة الهاتف
+        let savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        updateCounter();
 
-        // دالة حصرية لحساب التوقيت بنظام 24 ساعة بدقة (HH:MM:SS)
+        // حساب التوقيت بنظام 24 ساعة بدقة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const hours = String(now.getHours()).padStart(2, '0');
@@ -286,7 +317,7 @@
             return `${hours}:${minutes}:${seconds}`;
         }
 
-        // 1. منع الضغط على أي زر غير رقمي (0-9 فقط)
+        // منع الضغط على أي زر غير رقمي
         function isOnlyDigit(evt) {
             const charCode = (evt.which) ? evt.which : evt.keyCode;
             if (charCode < 48 || charCode > 57) {
@@ -295,31 +326,36 @@
             return true;
         }
 
-        // 2. تنظيف الإدخال فورياً وحذف أي حروف أو رموز وقصر الطول على 4 أرقام
+        // تنظيف الإدخال وحذف أي أحرف وقصر الطول على 4 أرقام
         function sanitizeInput(input) {
             input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
         }
 
-        // 3. تسجيل وعرض وقت الوصول بنظام 24 ساعة
+        // تسجيل وقت الوصول
         function recordArrival() {
             arrivalTime = get24HourTime();
             const badge = document.getElementById('arrivalBadge');
             badge.innerText = "Arrival: " + arrivalTime;
             badge.classList.add('active');
-            document.getElementById('statusMessage').innerText = "Arrival recorded at " + arrivalTime;
+            document.getElementById('statusMessage').innerText = "Arrival recorded: " + arrivalTime;
         }
 
-        // 4. تسجيل وعرض وقت المغادرة بنظام 24 ساعة
+        // تسجيل وقت المغادرة
         function recordDeparture() {
             departureTime = get24HourTime();
             const badge = document.getElementById('departureBadge');
             badge.innerText = "Departure: " + departureTime;
             badge.classList.add('active');
-            document.getElementById('statusMessage').innerText = "Departure recorded at " + departureTime;
+            document.getElementById('statusMessage').innerText = "Departure recorded: " + departureTime;
         }
 
-        // 5. مسح الحقول وإعادة التهيئة
-        function resetFields() {
+        // تحديث عداد القطارات المحفوظة
+        function updateCounter() {
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+        }
+
+        // مسح الحقول الحالية للقطار دون حذف السجلات السابقة
+        function resetCurrentForm() {
             document.getElementById('trainNumber').value = "";
             arrivalTime = "";
             departureTime = "";
@@ -332,11 +368,11 @@
             depBadge.innerText = "Departure: --:--:--";
             depBadge.classList.remove('active');
 
-            document.getElementById('statusMessage').innerText = "Fields reset.";
+            document.getElementById('statusMessage').innerText = "Ready for next train.";
         }
 
-        // 6. إرسال البيانات إلى شير بوينت عبر Power Automate
-        async function submitToSharePoint() {
+        // 1️⃣ حفظ بيانات القطار الحالي محلياً
+        function saveTrainRecord() {
             const trainNo = document.getElementById('trainNumber').value.trim();
 
             if (!trainNo) {
@@ -344,42 +380,67 @@
                 return;
             }
             if (!arrivalTime && !departureTime) {
-                alert("⚠️ Please record Arrival or Departure time before sending!");
+                alert("⚠️ Please record Arrival or Departure time before submitting!");
                 return;
             }
 
-            // ضع هنا رابط Webhook الخاص بك من Power Automate
-            const powerAutomateUrl = "YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE";
-
-            const payload = {
-                title: trainNo,
+            const newRecord = {
                 date: formattedDate,
                 trainNumber: trainNo,
-                trainArrival: arrivalTime || "",
-                trainDeparture: departureTime || ""
+                arrival: arrivalTime || "N/A",
+                departure: departureTime || "N/A",
+                timestamp: get24HourTime()
             };
 
-            document.getElementById('statusMessage').innerText = "Sending to SharePoint...";
+            savedRecords.push(newRecord);
+            localStorage.setItem('train_records', JSON.stringify(savedRecords));
+            
+            updateCounter();
+            alert(`✅ Train ${trainNo} saved locally! Total: ${savedRecords.length}`);
+            resetCurrentForm();
+        }
 
-            try {
-                const response = await fetch(powerAutomateUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+        // 2️⃣ تصدير وتنزيل جميع القطارات في ملف TXT واحد على الموبايل
+        function exportAllToTxt() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to download yet!");
+                return;
+            }
 
-                if (response.ok) {
-                    alert("✅ Data recorded in SharePoint successfully!");
-                    document.getElementById('statusMessage').innerText = "Saved successfully!";
-                    resetFields();
-                } else {
-                    alert("❌ Error sending data. Please verify your Power Automate Flow status.");
-                    document.getElementById('statusMessage').innerText = "Failed to send.";
-                }
-            } catch (error) {
-                console.error(error);
-                alert("⚠️ Could not connect. Please ensure your Power Automate URL is configured.");
-                document.getElementById('statusMessage').innerText = "Connection error.";
+            // تجهيز محتوى ملف الـ TXT بشكل منظم ومرتب
+            let fileContent = "========================================\n";
+            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
+            fileContent += `      Date: ${formattedDate} | Total Trains: ${savedRecords.length}\n`;
+            fileContent += "========================================\n\n";
+            fileContent += "Train No | Date       | Arrival  | Departure\n";
+            fileContent += "----------------------------------------\n";
+
+            savedRecords.forEach((item, index) => {
+                const trainFormatted = item.trainNumber.padEnd(8, ' ');
+                const dateFormatted = item.date.padEnd(10, ' ');
+                const arrFormatted = item.arrival.padEnd(8, ' ');
+                const depFormatted = item.departure.padEnd(8, ' ');
+                fileContent += `${trainFormatted} | ${dateFormatted} | ${arrFormatted} | ${depFormatted}\n`;
+            });
+
+            fileContent += "\n========================================\n";
+
+            // إنشاء ملف التكست وبدء التنزيل تلقائياً على الموبايل
+            const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+            const link = document.createElement("a");
+            const fileName = `Regularity_${formattedDate.replace(/\//g, '-')}_AllTrains.txt`;
+            
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            if (confirm("✅ TXT file downloaded successfully!\n\nDo you want to clear the saved trains list to start a new shift?")) {
+                savedRecords = [];
+                localStorage.removeItem('train_records');
+                updateCounter();
+                resetCurrentForm();
             }
         }
     </script>
