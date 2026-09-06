@@ -132,7 +132,7 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
             text-align: center;
-            display: block; /* Always visible to prevent any display errors */
+            display: block;
         }
 
         .btn:active {
@@ -233,7 +233,7 @@
                 autocomplete="off"
             />
 
-            <!-- All buttons are strictly visible to ensure zero execution fails on mobile devices -->
+            <!-- Always visible buttons to prevent rendering issues -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -269,7 +269,7 @@
         const exportBtn = document.getElementById('btnExport');
         const clearBtn = document.getElementById('btnClear');
 
-        // Prevent non-digits and cap at 4 digits instantly
+        // Prevent non-digits and limit to 4 characters
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
@@ -280,16 +280,15 @@
             }
         });
 
-        // 24-Hour clock format (HH:MM:SS)
+        // 24-Hour time
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
-            return `${h}:${m}:${s}`;
+            return h + ':' + m + ':' + s;
         }
 
-        // Tap Arrival
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -297,7 +296,6 @@
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
-        // Tap Departure
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -309,7 +307,6 @@
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
 
-        // Reset fields for the next train entry
         function resetCurrentForm() {
             inputField.value = "";
             arrivalTime = "";
@@ -336,7 +333,6 @@
                 return;
             }
 
-            // Add record to offline batch
             const newRecord = {
                 date: formattedDate,
                 trainNumber: trainNo,
@@ -351,49 +347,72 @@
             } catch(e) {}
             
             updateCounter();
-            alert(`✅ Train ${trainNo} saved locally! Total saved: ${savedRecords.length}`);
+            alert("✅ Train " + trainNo + " saved locally! Total saved: " + savedRecords.length);
             resetCurrentForm();
         }
 
-        // Export and compile all shifts to single TXT
+        // Multi-browser compatible file download (handles iOS Safari and Android Chrome sandbox blocks)
         function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet!");
                 return;
             }
 
-            let fileContent = "========================================\\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
-            fileContent += `      Date: ${formattedDate} | Total Trains: ${savedRecords.length}\\n`;
-            fileContent += "========================================\\n\\n";
-            fileContent += "Train No | Date       | Arrival  | Departure\\n";
-            fileContent += "----------------------------------------\\n";
+            let fileContent = "========================================\n";
+            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
+            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
+            fileContent += "========================================\n\n";
+            fileContent += "Train No | Date       | Arrival  | Departure\n";
+            fileContent += "----------------------------------------\n";
 
-            savedRecords.forEach((item) => {
+            savedRecords.forEach(function(item) {
                 const trainFormatted = item.trainNumber.padEnd(8, ' ');
                 const dateFormatted = item.date.padEnd(10, ' ');
                 const arrFormatted = item.arrival.padEnd(8, ' ');
                 const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += `${trainFormatted} | ${dateFormatted} | ${arrFormatted} | ${depFormatted}\\n`;
+                fileContent += trainFormatted + " | " + dateFormatted + " | " + arrFormatted + " | " + depFormatted + "\n";
             });
 
-            fileContent += "\\n========================================\\n";
+            fileContent += "\n========================================\n";
 
-            const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            const fileName = `Regularity_${formattedDate.replace(/\\//g, '-')}_AllTrains.txt`;
-            
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            try {
+                const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+                
+                // Fallback for Internet Explorer
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
+                    return;
+                }
 
-            if (confirm("✅ TXT report downloaded successfully!\\n\\nDo you want to clear the saved list to start fresh?")) {
-                savedRecords = [];
-                localStorage.removeItem('train_records');
-                updateCounter();
-                resetCurrentForm();
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_AllTrains.txt";
+                
+                link.href = url;
+                link.download = fileName;
+                link.target = "_blank"; // Crucial parameter to force open download dialog in iOS Safari & Chrome WebViews
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                // Keep the link for a split second before removing to ensure trigger succeeds
+                setTimeout(function() {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                setTimeout(function() {
+                    if (confirm("✅ TXT report downloaded successfully!\n\nDo you want to clear the saved list to start fresh?")) {
+                        savedRecords = [];
+                        localStorage.removeItem('train_records');
+                        updateCounter();
+                        resetCurrentForm();
+                    }
+                }, 500);
+
+            } catch (err) {
+                console.error(err);
+                alert("❌ Download block encountered. Copying report instead:\n\n" + fileContent);
             }
         }
     </script>
