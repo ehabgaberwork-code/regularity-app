@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
+    <!-- html2canvas library for capturing screenshots -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #005a79;
@@ -83,7 +85,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 30px;
+            margin-top: 35px;
             flex-grow: 1;
             justify-content: center;
             gap: 15px;
@@ -96,7 +98,7 @@
             margin: 0 0 5px 0;
         }
 
-        /* حقل إدخال رقم القطار */
+        /* Train Number Input - Custom Dialer-pad */
         .input-field {
             width: 100%;
             padding: 14px;
@@ -109,6 +111,13 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
+            -moz-appearance: textfield;
+        }
+
+        .input-field::-webkit-outer-spin-button,
+        .input-field::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         .input-field::placeholder {
@@ -118,7 +127,7 @@
             font-weight: normal;
         }
 
-        /* الأزرار التفاعلية */
+        /* Interactive Buttons */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -132,13 +141,13 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.3s ease;
             text-align: center;
-            display: none; /* مخفي افتراضياً ويظهر خطوة بخطوة */
-            animation: fadeIn 0.3s ease forwards;
+            display: none; /* Hidden by default, shown sequentially */
+            opacity: 0;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
+        .btn.visible {
+            display: block;
+            opacity: 1;
         }
 
         .btn:active {
@@ -152,17 +161,16 @@
             border: 2px solid #81c784;
         }
 
-        /* زر الحفظ وتنزيل الصورة */
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
+            margin-top: 5px;
         }
 
         .btn-submit:active {
             background-color: #1b5e20;
         }
 
-        /* زر تصدير الملف النصي */
         .btn-export {
             background-color: #f57c00;
             color: #ffffff;
@@ -228,37 +236,29 @@
             
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- 1. حقل رقم القطار -->
+            <!-- Train Input field -->
             <input 
-                type="text" 
+                type="tel" 
                 id="trainNumber" 
                 class="input-field" 
                 placeholder="Enter Train Number" 
+                maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*"
-                maxlength="4"
                 autocomplete="off"
             />
 
-            <!-- 2. زر وقت الوصول: يظهر تلقائياً بمجرد كتابة رقم القطار -->
+            <!-- Steps buttons -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
-
-            <!-- 3. زر وقت المغادرة: يظهر بعد تسجيل وقت الوصول -->
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
-
-            <!-- 4. زر الحفظ وتنزيل لقطة الشاشة: يظهر بعد تسجيل وقت المغادرة -->
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecordAndDownloadScreenshot()">📸 💾 Submit & Screenshot</button>
-            
-            <!-- 5. زر تصدير ملف TXT لكل القطارات -->
             <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
-            
-            <!-- زر إعادة الضبط للبدء من جديد -->
-            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Reset Form</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Current Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="status-msg" id="statusMessage">Enter train number to start...</div>
+            <div class="status-msg" id="statusMessage">Enter 4-digit Train Number to start...</div>
             <div>Ver 79</div>
         </div>
     </div>
@@ -277,32 +277,36 @@
         } catch(e) { savedRecords = []; }
         updateCounter();
 
-        // إظهار زر التصدير إذا كانت هناك قطارات مسجلة مسبقاً
-        if (savedRecords.length > 0) {
-            document.getElementById('btnExport').style.display = 'block';
-        }
-
         const inputField = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
+        const departureBtn = document.getElementById('btnDeparture');
+        const submitBtn = document.getElementById('btnSubmit');
+        const exportBtn = document.getElementById('btnExport');
         const clearBtn = document.getElementById('btnClear');
 
-        // 1. مراقبة الإدخال: إظهار زر Arrival فوراً بمجرد كتابة رقم القطار
+        if (savedRecords.length > 0) {
+            exportBtn.classList.add('visible');
+        }
+
+        // Real-time input checking to reveal the 'Train Arrival' button immediately upon typing 4 digits (e.g. 7071)
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
-            
-            if (val.length > 0) {
-                arrivalBtn.style.display = 'block';
-                clearBtn.style.display = 'block';
-                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap Train Arrival next.`;
+
+            if (val.length === 4) {
+                arrivalBtn.classList.add('visible');
+                clearBtn.classList.add('visible');
+                inputField.blur(); // dismiss mobile keyboard automatically
+                document.getElementById('statusMessage').innerText = `Train ${val} set. Tap 'Train Arrival' next.`;
             } else {
-                arrivalBtn.style.display = 'none';
-                clearBtn.style.display = 'none';
-                document.getElementById('statusMessage').innerText = "Enter train number to start...";
+                arrivalBtn.classList.remove('visible');
+                departureBtn.classList.remove('visible');
+                submitBtn.classList.remove('visible');
+                clearBtn.classList.remove('visible');
+                document.getElementById('statusMessage').innerText = "Please enter 4 digits.";
             }
         });
 
-        // 2. دالة حساب التوقيت بنظام 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -311,34 +315,26 @@
             return `${h}:${m}:${s}`;
         }
 
-        // 3. الضغط على Train Arrival: تسجيل الوقت وإظهار زر Train Departure فوراً
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.add('recorded');
-            
-            // إظهار زر المغادرة
-            document.getElementById('btnDeparture').style.display = 'block';
-            document.getElementById('statusMessage').innerText = `Arrival recorded at ${arrivalTime}. Tap Train Departure next.`;
+            departureBtn.classList.add('visible');
+            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
-        // 4. الضغط على Train Departure: تسجيل الوقت وإظهار زر Submit & Screenshot فوراً
         function handleDeparture() {
             departureTime = get24HourTime();
-            const depBtn = document.getElementById('btnDeparture');
-            depBtn.innerText = "Departure: " + departureTime;
-            depBtn.classList.add('recorded');
-            
-            // إظهار زر الحفظ
-            document.getElementById('btnSubmit').style.display = 'block';
-            document.getElementById('statusMessage').innerText = `Departure recorded at ${departureTime}. Tap Submit to save.`;
+            departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.add('recorded');
+            submitBtn.classList.add('visible');
+            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Submit & Screenshot' to save.`;
         }
 
         function updateCounter() {
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
 
-        // 5. مسح الحقول وتجهيز الواجهة لتسجيل القطار التالي
         function resetCurrentForm() {
             inputField.value = "";
             inputField.disabled = false;
@@ -347,24 +343,24 @@
             
             arrivalBtn.innerText = "Train Arrival";
             arrivalBtn.classList.remove('recorded');
-            arrivalBtn.style.display = 'none';
+            arrivalBtn.classList.remove('visible');
 
-            const depBtn = document.getElementById('btnDeparture');
-            depBtn.innerText = "Train Departure";
-            depBtn.classList.remove('recorded');
-            depBtn.style.display = 'none';
+            departureBtn.innerText = "Train Departure";
+            departureBtn.classList.remove('recorded');
+            departureBtn.classList.remove('visible');
 
-            document.getElementById('btnSubmit').style.display = 'none';
-            clearBtn.style.display = 'none';
+            submitBtn.classList.remove('visible');
+            clearBtn.classList.remove('visible');
 
             if (savedRecords.length > 0) {
-                document.getElementById('btnExport').style.display = 'block';
+                exportBtn.classList.add('visible');
+            } else {
+                exportBtn.classList.remove('visible');
             }
 
             document.getElementById('statusMessage').innerText = "Enter train number to start...";
         }
 
-        // 6. توليد وتنزيل لقطة الشاشة برمجياً كصورة PNG
         function generateAndDownloadImage(trainNo, dateText, arrText, depText) {
             const canvas = document.createElement('canvas');
             canvas.width = 600;
@@ -438,12 +434,11 @@
             document.body.removeChild(link);
         }
 
-        // 7. حفظ القطار وتنزيل لقطة الشاشة
         function saveRecordAndDownloadScreenshot() {
             const trainNo = inputField.value.trim();
 
-            if (!trainNo) {
-                alert("⚠️ Please enter Train Number first!");
+            if (!trainNo || trainNo.length < 4) {
+                alert("⚠️ Please enter a valid 4-digit Train Number first!");
                 return;
             }
 
@@ -463,45 +458,22 @@
             } catch(e) {}
             
             updateCounter();
-            alert(`✅ Train ${trainNo} saved & Screenshot downloaded! Total: ${savedRecords.length}`);
+            alert(`✅ Train ${trainNo} saved & Screenshot downloaded! Total saved: ${savedRecords.length}`);
             resetCurrentForm();
         }
 
-        // 8. تصدير وتنزيل ملف TXT لكل القطارات
         function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet!");
                 return;
             }
 
-            let fileContent = "========================================\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
-            fileContent += `      Date: ${formattedDate} | Total Trains: ${savedRecords.length}\n`;
-            fileContent += "========================================\n\n";
-            fileContent += "Train No | Date       | Arrival  | Departure\n";
-            fileContent += "----------------------------------------\n";
+            let fileContent = "========================================\\n";
+            fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
+            fileContent += `      Date: ${formattedDate} | Total Trains: ${savedRecords.length}\\n`;
+            fileContent += "========================================\\n\\n";
+            fileContent += "Train No | Date       | Arrival  | Departure\\n";
+            fileContent += "----------------------------------------\\n";
 
             savedRecords.forEach((item) => {
-                const trainFormatted = item.trainNumber.padEnd(8, ' ');
-                const dateFormatted = item.date.padEnd(10, ' ');
-                const arrFormatted = item.arrival.padEnd(8, ' ');
-                const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += `${trainFormatted} | ${dateFormatted} | ${arrFormatted} | ${depFormatted}\n`;
-            });
-
-            fileContent += "\n========================================\n";
-
-            const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            const fileName = `Regularity_${formattedDate.replace(/\//g, '-')}_AllTrains.txt`;
-            
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            if (confirm("✅ TXT file downloaded successfully!\n\nDo you want to clear the saved trains list to start a new shift?")) {
-                savedRecords = [];
-                localStorage.removeItem('train_records');
-                updateCounter();
+    
