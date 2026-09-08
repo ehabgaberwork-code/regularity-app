@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- تضمين مكتبة SheetJS لإنشاء وتصدير ملفات Excel الحقيقية -->
+    <!-- مكتبة SheetJS لإنشاء ملفات الإكسل الحقيقية -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -149,12 +149,16 @@
         .btn-submit:active {
             background-color: #1b5e20;
         }
-        .btn-export {
-            background-color: #107c41; /* لون أخضر إكسل المميز */
+        .btn-share {
+            background-color: #25D366; /* لون الواتساب والمشاركة */
             color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-export:active {
-            background-color: #0c592e;
+        .btn-share:active {
+            background-color: #128C7E;
         }
         .btn-clear {
             background-color: #c62828;
@@ -258,21 +262,22 @@
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToExcel()">📊 Download / Share (Excel)</button>
+            <button class="btn btn-share" id="btnExport" type="button" onclick="shareExcelFile()">
+                <span>📤 Share Excel File (WhatsApp)</span>
+            </button>
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 82 (Excel)</div>
+            <div>Ver 83 (Excel Share)</div>
         </div>
     </div>
 
     <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
     <script>
-        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -372,7 +377,6 @@
                 userSelect.classList.add('error-highlight');
                 userSelect.focus();
                 alert("⚠️ Please select User / Inspector Name first!");
-                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
                 return;
             }
 
@@ -380,21 +384,18 @@
                 trainInput.classList.add('error-highlight');
                 trainInput.focus();
                 alert("⚠️ Please enter a complete 4-digit Train Number!");
-                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
                 return;
             }
 
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
-                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
                 return;
             }
 
             if (!departureTime) {
                 departureBtn.classList.add('error-highlight');
                 alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
-                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
                 return;
             }
 
@@ -417,16 +418,17 @@
             resetCurrentForm();
         }
 
-        // تحضير وتصدير ملف Excel بصيغة .xlsx ومشاركته
-        async function exportAllToExcel() {
+        // دالة إنشاء ومشاركة ملف Excel عبر نافذة التطبيقات (WhatsApp, Telegram, Mail...)
+        async function shareExcelFile() {
             if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet! Please save at least one train.");
+                alert("⚠️ No saved trains to share yet! Please save at least one train.");
                 return;
             }
 
-            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.xlsx";
+            const cleanDate = formattedDate.replace(/\//g, '-');
+            const fileName = `Regularity_${cleanDate}_Report.xlsx`;
 
-            // تجهيز البيانات كجدول منظم
+            // إعداد محتوى ملف الإكسل
             const excelRows = savedRecords.map((item, index) => ({
                 "No.": index + 1,
                 "Date": item.date,
@@ -437,67 +439,68 @@
                 "Logged At": item.timestamp
             }));
 
-            // إنشاء ملف العمل والمصنف
             const worksheet = XLSX.utils.json_to_sheet(excelRows);
             const workbook = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(workbook, worksheet, "Regularity Report");
 
-            // تعديل عرض الأعمدة تلقائياً ليكون مناسباً
+            // تنسيق أحجام الأعمدة تلقائياً
             worksheet['!cols'] = [
-                { wch: 6 },  // No.
-                { wch: 14 }, // Date
-                { wch: 35 }, // User Name
-                { wch: 14 }, // Train No
-                { wch: 14 }, // Arrival
-                { wch: 14 }, // Departure
-                { wch: 12 }  // Timestamp
+                { wch: 6 },
+                { wch: 14 },
+                { wch: 35 },
+                { wch: 14 },
+                { wch: 14 },
+                { wch: 14 },
+                { wch: 12 }
             ];
 
-            // تحويل الملف إلى مصفوفة بايتات (ArrayBuffer)
             const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+            const excelBlob = new Blob([wbout], { 
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+            });
 
-            // 1. المشاركة عبر نافذة الهاتف (Share Sheet) كملف Excel حقيقي
-            if (navigator.canShare && navigator.share) {
+            // إنشاء ملف للمشاركة
+            const file = new File([excelBlob], fileName, { 
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+            });
+
+            // 1. محاولة فتح قائمة المشاركة الأصلية في الهاتف (Share Sheet) لاختيار WhatsApp
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
-                    const file = new File([blob], fileName, { 
-                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+                    await navigator.share({
+                        files: [file],
+                        title: "Regularity Excel Report",
+                        text: `Regularity Measurement Report - Date: ${formattedDate} (${savedRecords.length} trains)`
                     });
-
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: "Regularity Excel Report",
-                            text: "Regularity Measurement Report for " + formattedDate
-                        });
-                        promptReset();
-                        return;
-                    }
+                    promptReset();
+                    return;
                 } catch (e) {
-                    if (e.name === 'AbortError') return;
+                    if (e.name === 'AbortError') return; // إذا قام المستخدم بإلغاء المشاركة
+                    console.warn("Share sheet failed, falling back to download", e);
                 }
             }
 
-            // 2. التنزيل المباشر كملف .xlsx للمتصفح
+            // 2. خيار احتياطي: تنزيل الملف مباشرة على الجهاز إذا لم يدعم المتصفح Share Sheet
             try {
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                const url = URL.createObjectURL(excelBlob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
+                alert("📥 File downloaded! You can now attach it to WhatsApp.");
                 promptReset();
             } catch (err) {
-                console.error("Download error:", err);
-                alert("Download failed. Please check browser permissions.");
+                console.error("Export error:", err);
+                alert("Could not export file. Please try again.");
             }
         }
 
         function promptReset() {
             setTimeout(function() {
-                if (confirm("✅ Excel report exported successfully!\n\nDo you want to clear the saved list to start a new shift?")) {
+                if (confirm("✅ Done!\n\nDo you want to clear the list and start a new shift?")) {
                     savedRecords = [];
                     localStorage.removeItem('train_records');
                     updateCounter();
