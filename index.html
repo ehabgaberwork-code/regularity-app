@@ -40,65 +40,64 @@
 
         .header {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 6px;
             margin-top: 5px;
+            width: 100%;
         }
 
         .header-title {
             font-size: 24px;
             font-weight: bold;
             text-align: center;
-            width: 100%;
             letter-spacing: 0.5px;
         }
 
         .date-display {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(0, 0, 0, 0.2);
             padding: 4px 14px;
             border-radius: 20px;
-            margin: 5px auto 0 auto;
         }
 
         .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 35px;
+            margin-top: 15px;
             flex-grow: 1;
             justify-content: center;
-            gap: 15px;
+            gap: 12px;
             width: 100%;
         }
 
-        .section-title {
-            font-size: 30px;
-            font-weight: bold;
-            margin: 0 0 5px 0;
-        }
-
-        /* Train Number Input - Custom Dialer-pad */
+        /* Input fields */
         .input-field {
             width: 100%;
-            padding: 14px;
-            font-size: 26px;
+            padding: 12px;
+            font-size: 20px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
             color: #004d66;
-            letter-spacing: 6px;
             font-weight: bold;
             transition: all 0.2s ease;
         }
 
+        .input-field.train-no {
+            font-size: 26px;
+            letter-spacing: 6px;
+        }
+
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 16px;
+            font-size: 15px;
             letter-spacing: normal;
             font-weight: normal;
         }
@@ -110,8 +109,8 @@
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 16px 0;
-            font-size: 20px;
+            padding: 15px 0;
+            font-size: 19px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -148,7 +147,7 @@
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .btn-submit:active {
@@ -167,19 +166,19 @@
         .btn-clear {
             background-color: #c62828;
             color: #ffffff;
-            font-size: 15px;
-            padding: 10px 0;
-            width: 60%;
+            font-size: 14px;
+            padding: 8px 0;
+            width: 50%;
         }
 
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #ffd54f;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .footer {
@@ -188,7 +187,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .status-msg {
@@ -198,6 +197,66 @@
             min-height: 18px;
             text-align: left;
         }
+
+        /* Modal fallback for preview/copy */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            color: #333333;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-card textarea {
+            width: 100%;
+            height: 180px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        .modal-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-btn.copy {
+            background-color: #005a79;
+            color: #ffffff;
+        }
+
+        .modal-btn.close {
+            background-color: #e0e0e0;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -206,43 +265,61 @@
         <!-- Header -->
         <div class="header">
             <div class="header-title">Regularity Measurement</div>
+            <div class="date-display" id="currentDate"></div>
         </div>
-        <div class="date-display" id="currentDate"></div>
 
         <!-- Main Content -->
         <div class="content">
-            <h1 class="section-title">Train Number</h1>
-            
-            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+            <!-- حقل اسم المستخدم -->
+            <input 
+                type="text" 
+                id="userName" 
+                class="input-field" 
+                placeholder="👤 Enter User Name" 
+                autocomplete="name"
+            />
 
-            <!-- Train Input field -->
+            <!-- حقل رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
-                class="input-field" 
-                placeholder="Enter Train Number" 
+                class="input-field train-no" 
+                placeholder="🚆 Train Number (4 digits)" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*"
+                pattern="[0-9]*" 
                 autocomplete="off"
             />
 
-            <!-- All buttons are fully visible and active -->
+            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+
+            <!-- أزرار التسجيل -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
-            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Current Form</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="status-msg" id="statusMessage">Enter Train Number & Tap Buttons...</div>
-            <div>Ver 79</div>
+            <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
+            <div>Ver 80</div>
+        </div>
+    </div>
+
+    <!-- نافذة منبثقة احتياطية للنسخ المباشر -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-card">
+            <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
+            <textarea id="reportTextArea" readonly></textarea>
+            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy All Text</button>
+            <button class="modal-btn close" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
+        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -251,18 +328,28 @@
         let departureTime = "";
         let savedRecords = [];
 
+        // استرجاع السجلات السابقة
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
             savedRecords = [];
         }
 
-        const inputField = document.getElementById('trainNumber');
+        const userInput = document.getElementById('userName');
+        const trainInput = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
-        const submitBtn = document.getElementById('btnSubmit');
-        const exportBtn = document.getElementById('btnExport');
-        const clearBtn = document.getElementById('btnClear');
+
+        // استرجاع اسم المستخدم المحفوظ تلقائياً
+        const savedUserName = localStorage.getItem('user_name') || '';
+        if (savedUserName) {
+            userInput.value = savedUserName;
+        }
+
+        userInput.addEventListener('input', function() {
+            this.classList.remove('error-highlight');
+            localStorage.setItem('user_name', this.value.trim());
+        });
 
         function updateCounter() {
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
@@ -270,18 +357,19 @@
 
         updateCounter();
 
-        // Prevent non-digits and cap at 4 characters
-        inputField.addEventListener('input', function() {
+        // إدخال أرقام فقط لرقم القطار
+        trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
             if (val.length > 0) {
-                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
+                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
             } else {
-                document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
+                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
             }
         });
 
+        // صيغة 24 ساعة
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -290,6 +378,7 @@
             return h + ':' + m + ':' + s;
         }
 
+        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -298,17 +387,19 @@
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
+        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
             departureBtn.classList.remove('error-highlight');
             departureBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
+            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
+        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
-            inputField.value = "";
-            inputField.classList.remove('error-highlight');
+            trainInput.value = "";
+            trainInput.classList.remove('error-highlight');
             arrivalTime = "";
             departureTime = "";
             
@@ -321,19 +412,27 @@
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
+        // حفظ القطار مع التحقق من جميع الحقول
         function saveRecord() {
-            const trainNo = inputField.value.trim();
+            const user = userInput.value.trim();
+            const trainNo = trainInput.value.trim();
 
-            // 1. Validate Train Number (must be exactly 4 digits)
+            if (!user) {
+                userInput.classList.add('error-highlight');
+                userInput.focus();
+                alert("⚠️ Please enter User Name first!");
+                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
+                return;
+            }
+
             if (!trainNo || trainNo.length < 4) {
-                inputField.classList.add('error-highlight');
-                inputField.focus();
-                alert("⚠️ Please enter a complete 4-digit Train Number first!");
+                trainInput.classList.add('error-highlight');
+                trainInput.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number!");
                 document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
                 return;
             }
 
-            // 2. Validate Train Arrival Time
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
@@ -341,7 +440,6 @@
                 return;
             }
 
-            // 3. Validate Train Departure Time
             if (!departureTime) {
                 departureBtn.classList.add('error-highlight');
                 alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
@@ -349,8 +447,8 @@
                 return;
             }
 
-            // If all fields are fully completed
             const newRecord = {
+                user: user,
                 date: formattedDate,
                 trainNumber: trainNo,
                 arrival: arrivalTime,
@@ -368,70 +466,100 @@
             resetCurrentForm();
         }
 
-        function exportAllToTxt() {
+        // بناء نص التقرير بأسطر نظيفة
+        function buildReportText() {
+            const user = userInput.value.trim() || (savedRecords[0] ? savedRecords[0].user : "Operator");
+            let txt = "========================================\n";
+            txt += "      REGULARITY MEASUREMENT REPORT      \n";
+            txt += "      Inspector / User: " + user + "\n";
+            txt += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
+            txt += "========================================\n\n";
+            txt += "Date       | Train No | Arrival  | Departure\n";
+            txt += "----------------------------------------\n";
+
+            savedRecords.forEach(function(item) {
+                const d = item.date.padEnd(10, ' ');
+                const t = item.trainNumber.padEnd(8, ' ');
+                const a = item.arrival.padEnd(8, ' ');
+                const dep = item.departure.padEnd(8, ' ');
+                txt += d + " | " + t + " | " + a + " | " + dep + "\n";
+            });
+
+            txt += "\n========================================\n";
+            return txt;
+        }
+
+        // تنزيل ومشاركة الملف بأمان تام على كل الهواتف
+        async function exportAllToTxt() {
             if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet!");
+                alert("⚠️ No saved trains to download yet! Please save at least one train.");
                 return;
             }
 
-            // Clean, pure linebreaks for text reports
-            let fileContent = "========================================\\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
-            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\\n";
-            fileContent += "========================================\\n\\n";
-            fileContent += "Date       | Train No | Arrival  | Departure\\n";
-            fileContent += "----------------------------------------\\n";
+            const reportText = buildReportText();
+            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
 
-            savedRecords.forEach(function(item) {
-                const dateFormatted = item.date.padEnd(10, ' ');
-                const trainFormatted = item.trainNumber.padEnd(8, ' ');
-                const arrFormatted = item.arrival.padEnd(8, ' ');
-                const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += dateFormatted + " | " + trainFormatted + " | " + arrFormatted + " | " + depFormatted + "\\n";
-            });
-
-            fileContent += "\\n========================================\\n";
-
-            // Unescape newline characters
-            const cleanContent = fileContent.replace(/\\\\n/g, '\\n');
-
-            try {
-                const blob = new Blob([cleanContent], { type: "text/plain;charset=utf-8" });
-                
-                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
-                    return;
+            // 1. استخدام خاصية المشاركة المباشرة للهواتف (Save to Files / Share)
+            if (navigator.canShare && navigator.share) {
+                try {
+                    const file = new File([reportText], fileName, { type: "text/plain" });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: "Regularity Report",
+                            text: "Regularity Report for " + formattedDate
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
                 }
+            }
 
-                const url = URL.createObjectURL(blob);
+            // 2. تنزيل مباشر عبر Data URI المتوافق
+            try {
+                const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
                 const link = document.createElement("a");
-                const fileName = "Regularity_" + formattedDate.replace(/\\//g, '-') + "_AllTrains.txt";
-                
-                link.href = url;
-                link.download = fileName;
-                link.target = "_blank";
-                
+                link.setAttribute("href", encodedData);
+                link.setAttribute("download", fileName);
+                link.style.display = "none";
                 document.body.appendChild(link);
                 link.click();
-                
-                setTimeout(function() {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 100);
-
-                setTimeout(function() {
-                    if (confirm("✅ TXT report downloaded successfully!\\n\\nDo you want to clear the saved list to start fresh?")) {
-                        savedRecords = [];
-                        localStorage.removeItem('train_records');
-                        updateCounter();
-                        resetCurrentForm();
-                    }
-                }, 500);
-
+                document.body.removeChild(link);
+                promptReset();
+                return;
             } catch (err) {
-                console.error(err);
-                alert("❌ Download block encountered. Copying report instead:\\n\\n" + cleanContent);
+                console.error("Download error:", err);
             }
+
+            // 3. النافذة الاحتياطية لعرض ونسخ النص فوراً
+            document.getElementById('reportTextArea').value = reportText;
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function copyReportText() {
+            const ta = document.getElementById('reportTextArea');
+            ta.select();
+            ta.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert("📋 Report text copied to clipboard successfully!");
+        }
+
+        function closeModal() {
+            document.getElementById('reportModal').style.display = 'none';
+            promptReset();
+        }
+
+        function promptReset() {
+            setTimeout(function() {
+                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start a new shift?")) {
+                    savedRecords = [];
+                    localStorage.removeItem('train_records');
+                    updateCounter();
+                    resetCurrentForm();
+                }
+            }, 500);
         }
     </script>
 </body>
