@@ -75,14 +75,20 @@
             width: 100%;
         }
 
-        /* قائمة اختيار اسم المستخدم */
+        .section-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 0 2px 0;
+        }
+
+        /* Dropdown selector styling */
         .select-field {
             width: 100%;
             padding: 13px;
             font-size: 17px;
             border: 2px solid transparent;
             border-radius: 6px;
-            text-align: center;
+            text-align-last: center;
             box-sizing: border-box;
             background-color: #ffffff;
             color: #004d66;
@@ -92,10 +98,10 @@
             transition: all 0.2s ease;
         }
 
-        /* حقل رقم القطار */
+        /* Input fields */
         .input-field {
             width: 100%;
-            padding: 12px;
+            padding: 13px;
             font-size: 26px;
             border: 2px solid transparent;
             border-radius: 6px;
@@ -116,7 +122,7 @@
             font-weight: normal;
         }
 
-        /* أزرار التسجيل */
+        /* Interactive Buttons */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -144,7 +150,7 @@
             border: 2px solid #81c784;
         }
 
-        /* تحديد الحقل غير المكتمل */
+        /* Error state styling */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
@@ -212,7 +218,7 @@
             text-align: left;
         }
 
-        /* إشعار الحفظ السريع المنبثق (Toast) */
+        /* Toast message styling - 2 seconds auto fade away */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -232,6 +238,9 @@
             transition: all 0.4s ease;
             z-index: 1000;
             pointer-events: none;
+            text-align: center;
+            width: 80%;
+            max-width: 320px;
         }
 
         .toast.show {
@@ -239,7 +248,7 @@
             opacity: 1;
         }
 
-        /* نافذة احتياطية لنسخ النص في حال منع المتصفح للتنزيل */
+        /* Modal fallback for preview/copy text if download blocked */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -311,69 +320,58 @@
 
         <!-- Main Content -->
         <div class="content">
-            <!-- قائمة اختيار المفتش / المستخدم من الأسماء المحددة -->
+            <!-- Inspectors Dropdown Menu -->
             <select id="userSelect" class="select-field">
-                <option value="" disabled selected>👤 Select User / Inspector Name</option>
-                <option value="Fathy Helmy">Fathy Helmy</option>
-                <option value="Fattouh Hassan">Fattouh Hassan</option>
-                <option value="Karim Gamal">Karim Gamal</option>
-                <option value="Salah Al-Din">Salah Al-Din</option>
-                <option value="Karim Moustafa">Karim Moustafa</option>
-                <option value="Mostafa Khaled">Mostafa Khaled</option>
-                <option value="Mostafa Abdel Moneim">Mostafa Abdel Moneim</option>
+                <option value="" disabled selected>Select User / Inspector Name</option>
+                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
+                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
+                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
+                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
                 <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
-                <option value="Shorouk Tarek">Shorouk Tarek</option>
-                <option value="Taha Yaseen">Taha Yaseen</option>
-                <option value="Mahmoud Taher">Mahmoud Taher</option>
-                <option value="Mahmoud Zaki">Mahmoud Zaki</option>
+                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
+                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
                 <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
-                <option value="Nancy Hesham">Nancy Hesham</option>
-                <option value="Hassan Abdelrehim">Hassan Abdelrehim</option>
-                <option value="Nourhan Karam">Nourhan Karam</option>
-                <option value="Hanafy Mohamdy">Hanafy Mohamdy</option>
-                <option value="Mohamed Emad Imam">Mohamed Emad Imam</option>
-                <option value="Mahmoud Ehab">Mahmoud Ehab</option>
-                <option value="Shabaan Fahmy">Shabaan Fahmy</option>
-                <option value="Elsayed Donia">Elsayed Donia</option>
-                <option value="Samir Abdelrazek">Samir Abdelrazek</option>
-                <option value="Ahmed Yasmine">Ahmed Yasmine</option>
-                <option value="Mohamed Alsayed">Mohamed Alsayed</option>
-                <option value="Abdelsattar Akila">Abdelsattar Akila</option>
+                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
+                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
+                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
+                <option value="Donia Samir Abdelrazek Ahmed">Donia Samir Abdelrazek Ahmed</option>
+                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
             </select>
 
-            <!-- حقل رقم القطار -->
+            <!-- Train Number Input field -->
             <input 
                 type="tel" 
                 id="trainNumber" 
                 class="input-field" 
-                placeholder="🚆 Train Number (4 digits)" 
+                placeholder="Enter Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*" 
+                pattern="[0-9]*"
                 autocomplete="off"
             />
 
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- أزرار التسجيل -->
+            <!-- Steps buttons -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 81</div>
+            <div>Ver 82</div>
         </div>
     </div>
 
-    <!-- عنصر الإشعار السريع (Toast Notification) -->
-    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
+    <!-- Green Toast notification banner -->
+    <div class="toast" id="toastMessage"></div>
 
-    <!-- نافذة منبثقة احتياطية للنسخ المباشر -->
+    <!-- Backup Modal for direct copying of text report -->
     <div class="modal-overlay" id="reportModal">
         <div class="modal-card">
             <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
@@ -384,7 +382,6 @@
     </div>
 
     <script>
-        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -393,7 +390,6 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // استرجاع السجلات السابقة من ذاكرة الهاتف
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -404,11 +400,14 @@
         const trainInput = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
+        const submitBtn = document.getElementById('btnSubmit');
+        const exportBtn = document.getElementById('btnExport');
+        const clearBtn = document.getElementById('btnClear');
 
-        // استرجاع آخر اسم مستخدم تم اختياره تلقائياً
-        const savedUser = localStorage.getItem('selected_user') || '';
-        if (savedUser) {
-            userSelect.value = savedUser;
+        // Restore last selected user instantly from memory
+        const lastSelectedUser = localStorage.getItem('selected_user') || '';
+        if (lastSelectedUser) {
+            userSelect.value = lastSelectedUser;
         }
 
         userSelect.addEventListener('change', function() {
@@ -422,19 +421,18 @@
 
         updateCounter();
 
-        // إدخال أرقام فقط لرقم القطار
+        // Numeric checking and clearing error border
         trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
             if (val.length > 0) {
-                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
+                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
             } else {
-                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
+                document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
             }
         });
 
-        // دالة التوقيت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -443,25 +441,23 @@
             return h + ':' + m + ':' + s;
         }
 
-        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
+            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
         }
 
-        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
             departureBtn.classList.remove('error-highlight');
             departureBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
+            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
         }
 
-        // إظهار إشعار الحفظ السريع
+        // Animated 2-seconds Toast success message
         function showToast(text) {
             const toast = document.getElementById('toastMessage');
             toast.innerText = text;
@@ -471,7 +467,6 @@
             }, 2000);
         }
 
-        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -487,30 +482,30 @@
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
-        // حفظ القطار مع التحقق من جميع الحقول
+        // High strict saving validation
         function saveRecord() {
             const user = userSelect.value;
             const trainNo = trainInput.value.trim();
 
-            // 1. التحقق من اختيار اسم المستخدم
+            // 1. Verify User select dropdown
             if (!user) {
                 userSelect.classList.add('error-highlight');
                 userSelect.focus();
                 alert("⚠️ Please select User / Inspector Name first!");
-                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
+                document.getElementById('statusMessage').innerText = "⚠️ User / Inspector is required!";
                 return;
             }
 
-            // 2. التحقق من رقم القطار (4 أرقام)
+            // 2. Verify complete 4 digits train no
             if (!trainNo || trainNo.length < 4) {
                 trainInput.classList.add('error-highlight');
                 trainInput.focus();
-                alert("⚠️ Please enter a complete 4-digit Train Number!");
+                alert("⚠️ Please enter a complete 4-digit Train Number first!");
                 document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
                 return;
             }
 
-            // 3. التحقق من وقت الوصول
+            // 3. Verify Arrival registration
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
@@ -518,7 +513,7 @@
                 return;
             }
 
-            // 4. التحقق من وقت المغادرة
+            // 4. Verify Departure registration
             if (!departureTime) {
                 departureBtn.classList.add('error-highlight');
                 alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
@@ -526,7 +521,6 @@
                 return;
             }
 
-            // حفظ السجل
             const newRecord = {
                 date: formattedDate,
                 user: user,
@@ -542,13 +536,11 @@
             } catch(e) {}
             
             updateCounter();
-            
-            // إظهار إشعار الحفظ السريع
-            showToast(`✅ Train ${trainNo} Saved! (${savedRecords.length})`);
+            showToast("✅ Train " + trainNo + " Saved Successfully!");
             resetCurrentForm();
         }
 
-        // إنشاء محتوى التقرير النصي بالترتيب: التاريخ -> الاسم -> رقم القطار -> الوصول -> المغادرة
+        // Build report with actual correct linebreaks and columns order: Date | User | Train No | Arrival | Departure
         function buildReportText() {
             let txt = "========================================================================================\n";
             txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
@@ -570,7 +562,7 @@
             return txt;
         }
 
-        // تصدير وتنزيل الملف
+        // Bulletproof high-compatibility download/share workflow
         async function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet! Please save at least one train.");
@@ -580,7 +572,7 @@
             const reportText = buildReportText();
             const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
 
-            // 1. المشاركة عبر نافذة الهاتف (Share Sheet)
+            // Level 1: Mobile Share Sheet integration (Universal safe save/send on all smart devices)
             if (navigator.canShare && navigator.share) {
                 try {
                     const file = new File([reportText], fileName, { type: "text/plain" });
@@ -598,12 +590,13 @@
                 }
             }
 
-            // 2. تنزيل مباشر عبر Data URI
+            // Level 2: Strict direct Data URI trigger
             try {
                 const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
                 const link = document.createElement("a");
                 link.setAttribute("href", encodedData);
                 link.setAttribute("download", fileName);
+                link.setAttribute("target", "_blank");
                 link.style.display = "none";
                 document.body.appendChild(link);
                 link.click();
@@ -611,10 +604,10 @@
                 promptReset();
                 return;
             } catch (err) {
-                console.error("Download error:", err);
+                console.error("URI Download error:", err);
             }
 
-            // 3. النافذة الاحتياطية للنسخ الفوري
+            // Level 3: Modal overlay fallback (Copy and paste manual)
             document.getElementById('reportTextArea').value = reportText;
             document.getElementById('reportModal').style.display = 'flex';
         }
