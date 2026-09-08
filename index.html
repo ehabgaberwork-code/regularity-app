@@ -29,7 +29,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 16px 20px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -43,47 +43,46 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 2px;
-            margin-top: 2px;
+            gap: 6px;
+            margin-top: 5px;
             width: 100%;
         }
 
         .header-title {
-            font-size: 23px;
+            font-size: 24px;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
         }
 
         .date-display {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(0, 0, 0, 0.2);
-            padding: 3px 12px;
+            padding: 4px 14px;
             border-radius: 20px;
-            margin-top: 2px;
         }
 
         .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 6px;
+            margin-top: 15px;
             flex-grow: 1;
             justify-content: center;
-            gap: 11px;
+            gap: 12px;
             width: 100%;
         }
 
         /* قائمة اختيار اسم المستخدم */
         .select-field {
             width: 100%;
-            padding: 12px;
-            font-size: 16px;
+            padding: 13px;
+            font-size: 17px;
             border: 2px solid transparent;
             border-radius: 6px;
-            text-align-last: center;
+            text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
             color: #004d66;
@@ -97,7 +96,7 @@
         .input-field {
             width: 100%;
             padding: 12px;
-            font-size: 24px;
+            font-size: 26px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -117,23 +116,21 @@
             font-weight: normal;
         }
 
-        /* الأزرار التفاعلية */
+        /* أزرار التسجيل */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 14px 0;
-            font-size: 18px;
+            padding: 15px 0;
+            font-size: 19px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
             text-align: center;
             display: block;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:active {
@@ -204,7 +201,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 8px;
+            margin-top: 10px;
         }
 
         .status-msg {
@@ -215,7 +212,7 @@
             text-align: left;
         }
 
-        /* إشعار الحفظ السريع */
+        /* إشعار الحفظ السريع المنبثق (Toast) */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -230,20 +227,76 @@
             font-weight: bold;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
             opacity: 0;
             transition: all 0.4s ease;
             z-index: 1000;
             pointer-events: none;
-            text-align: center;
-            width: 80%;
-            max-width: 320px;
         }
 
         .toast.show {
             transform: translateX(-50%) translateY(0);
             opacity: 1;
+        }
+
+        /* نافذة احتياطية لنسخ النص في حال منع المتصفح للتنزيل */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .modal-card {
+            background: #ffffff;
+            color: #333333;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .modal-card textarea {
+            width: 100%;
+            height: 180px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            resize: none;
+        }
+
+        .modal-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .modal-btn.copy {
+            background-color: #005a79;
+            color: #ffffff;
+        }
+
+        .modal-btn.close {
+            background-color: #e0e0e0;
+            color: #333;
         }
     </style>
 </head>
@@ -253,12 +306,12 @@
         <!-- Header -->
         <div class="header">
             <div class="header-title">Regularity Measurement</div>
-            <div class="date-display" id="currentDate">--/--/----</div>
+            <div class="date-display" id="currentDate"></div>
         </div>
 
         <!-- Main Content -->
         <div class="content">
-            <!-- قائمة الأسماء المنسدلة -->
+            <!-- قائمة اختيار المفتش / المستخدم من الأسماء المحددة بدقة -->
             <select id="userSelect" class="select-field">
                 <option value="" disabled selected>👤 Select User / Inspector Name</option>
                 <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
@@ -277,12 +330,12 @@
                 <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
             </select>
 
-            <!-- حقل إدخال رقم القطار -->
+            <!-- حقل رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
                 class="input-field" 
-                placeholder="Enter Train Number" 
+                placeholder="🚆 Train Number (4 digits)" 
                 maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*" 
@@ -291,7 +344,7 @@
 
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- أزرار التسجيل والتحكم -->
+            <!-- أزرار التسجيل -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -302,17 +355,27 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 90</div>
+            <div>Ver 81</div>
         </div>
     </div>
 
-    <!-- إشعار الحفظ الأخضر -->
-    <div class="toast" id="toastMessage"></div>
+    <!-- عنصر الإشعار السريع (Toast Notification) -->
+    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
+
+    <!-- نافذة منبثقة احتياطية للنسخ المباشر -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-card">
+            <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
+            <textarea id="reportTextArea" readonly></textarea>
+            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy All Text</button>
+            <button class="modal-btn close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
 
     <script>
-        // إعداد التاريخ
-        const nowObj = new Date();
-        const formattedDate = (nowObj.getMonth() + 1) + '/' + nowObj.getDate() + '/' + nowObj.getFullYear();
+        // ضبط تاريخ اليوم
+        const today = new Date();
+        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
 
         let arrivalTime = "";
@@ -330,11 +393,8 @@
         const trainInput = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
-        const statusMsg = document.getElementById('statusMessage');
-        const trainCounter = document.getElementById('trainCounter');
-        const toastMessage = document.getElementById('toastMessage');
 
-        // استرجاع آخر اسم مستخدم تم اختياره
+        // استرجاع آخر اسم مستخدم تم اختياره تلقائياً
         const savedUser = localStorage.getItem('selected_user') || '';
         if (savedUser) {
             userSelect.value = savedUser;
@@ -346,8 +406,9 @@
         });
 
         function updateCounter() {
-            trainCounter.innerText = "Saved Trains: " + savedRecords.length;
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
+
         updateCounter();
 
         // إدخال أرقام فقط لرقم القطار
@@ -356,13 +417,13 @@
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
             if (val.length > 0) {
-                statusMsg.innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
+                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
             } else {
-                statusMsg.innerText = "Enter Train Number & Tap Buttons...";
+                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
             }
         });
 
-        // دالة التوقيت بصيغة 24 ساعة (HH:MM:SS)
+        // دالة التوقيت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -371,65 +432,15 @@
             return h + ':' + m + ':' + s;
         }
 
-        // 1. تسجيل وقت الوصول
-        window.handleArrival = function() {
+        // تسجيل وقت الوصول
+        function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
-            statusMsg.innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
-        };
-
-        // 2. تسجيل وقت المغادرة
-        window.handleDeparture = function() {
-            departureTime = get24HourTime();
-            departureBtn.innerText = "Departure: " + departureTime;
-            departureBtn.classList.remove('error-highlight');
-            departureBtn.classList.add('recorded');
-            statusMsg.innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
-        };
-
-        // إظهار إشعار الحفظ السريع
-        function showToast(text) {
-            toastMessage.innerText = text;
-            toastMessage.classList.add('show');
-            setTimeout(function() {
-                toastMessage.classList.remove('show');
-            }, 2000);
+            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
-        // مسح الحقول للقطار التالي
-        window.resetCurrentForm = function() {
-            trainInput.value = "";
-            trainInput.classList.remove('error-highlight');
-            arrivalTime = "";
-            departureTime = "";
-            
-            arrivalBtn.innerText = "Train Arrival";
-            arrivalBtn.classList.remove('recorded', 'error-highlight');
-
-            departureBtn.innerText = "Train Departure";
-            departureBtn.classList.remove('recorded', 'error-highlight');
-
-            statusMsg.innerText = "Enter Train Number & Tap Buttons...";
-        };
-
-        // 3. حفظ بيانات القطار
-        window.saveRecord = function() {
-            const user = userSelect.value;
-            const trainNo = trainInput.value.trim();
-
-            // التحقق من الاسم
-            if (!user) {
-                userSelect.classList.add('error-highlight');
-                userSelect.focus();
-                alert("⚠️ Please select User / Inspector Name first!");
-                statusMsg.innerText = "⚠️ User / Inspector is required!";
-                return;
-            }
-
-            // التحقق من رقم القطار (4 أرقام)
-            if (!trainNo || trainNo.length < 4) {
-                trainInput.classList.add('error-highlight');
-                trainInput.focus();
-           
+        // تسجيل وقت المغادرة
+        function handleDeparture() {
+            d
