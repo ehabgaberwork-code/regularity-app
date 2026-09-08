@@ -75,11 +75,11 @@
             width: 100%;
         }
 
-        /* Input fields */
-        .input-field {
+        /* قائمة اختيار اسم المستخدم */
+        .select-field {
             width: 100%;
-            padding: 12px;
-            font-size: 20px;
+            padding: 13px;
+            font-size: 17px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -87,12 +87,26 @@
             background-color: #ffffff;
             color: #004d66;
             font-weight: bold;
+            cursor: pointer;
+            outline: none;
             transition: all 0.2s ease;
         }
 
-        .input-field.train-no {
+        /* حقل رقم القطار */
+        .input-field {
+            width: 100%;
+            padding: 12px;
             font-size: 26px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            text-align: center;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #004d66;
             letter-spacing: 6px;
+            font-weight: bold;
+            outline: none;
+            transition: all 0.2s ease;
         }
 
         .input-field::placeholder {
@@ -102,7 +116,7 @@
             font-weight: normal;
         }
 
-        /* Interactive Buttons */
+        /* أزرار التسجيل */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -130,7 +144,7 @@
             border: 2px solid #81c784;
         }
 
-        /* Error state styling */
+        /* تحديد الحقل غير المكتمل */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
@@ -198,7 +212,34 @@
             text-align: left;
         }
 
-        /* Modal fallback for preview/copy */
+        /* إشعار الحفظ السريع المنبثق (Toast) */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #1b5e20;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* نافذة احتياطية لنسخ النص في حال منع المتصفح للتنزيل */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -270,20 +311,41 @@
 
         <!-- Main Content -->
         <div class="content">
-            <!-- حقل اسم المستخدم -->
-            <input 
-                type="text" 
-                id="userName" 
-                class="input-field" 
-                placeholder="👤 Enter User Name" 
-                autocomplete="name"
-            />
+            <!-- قائمة اختيار المفتش / المستخدم من الأسماء المحددة -->
+            <select id="userSelect" class="select-field">
+                <option value="" disabled selected>👤 Select User / Inspector Name</option>
+                <option value="Fathy Helmy">Fathy Helmy</option>
+                <option value="Fattouh Hassan">Fattouh Hassan</option>
+                <option value="Karim Gamal">Karim Gamal</option>
+                <option value="Salah Al-Din">Salah Al-Din</option>
+                <option value="Karim Moustafa">Karim Moustafa</option>
+                <option value="Mostafa Khaled">Mostafa Khaled</option>
+                <option value="Mostafa Abdel Moneim">Mostafa Abdel Moneim</option>
+                <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
+                <option value="Shorouk Tarek">Shorouk Tarek</option>
+                <option value="Taha Yaseen">Taha Yaseen</option>
+                <option value="Mahmoud Taher">Mahmoud Taher</option>
+                <option value="Mahmoud Zaki">Mahmoud Zaki</option>
+                <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
+                <option value="Nancy Hesham">Nancy Hesham</option>
+                <option value="Hassan Abdelrehim">Hassan Abdelrehim</option>
+                <option value="Nourhan Karam">Nourhan Karam</option>
+                <option value="Hanafy Mohamdy">Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam">Mohamed Emad Imam</option>
+                <option value="Mahmoud Ehab">Mahmoud Ehab</option>
+                <option value="Shabaan Fahmy">Shabaan Fahmy</option>
+                <option value="Elsayed Donia">Elsayed Donia</option>
+                <option value="Samir Abdelrazek">Samir Abdelrazek</option>
+                <option value="Ahmed Yasmine">Ahmed Yasmine</option>
+                <option value="Mohamed Alsayed">Mohamed Alsayed</option>
+                <option value="Abdelsattar Akila">Abdelsattar Akila</option>
+            </select>
 
             <!-- حقل رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
-                class="input-field train-no" 
+                class="input-field" 
                 placeholder="🚆 Train Number (4 digits)" 
                 maxlength="4" 
                 inputmode="numeric" 
@@ -304,9 +366,12 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 80</div>
+            <div>Ver 81</div>
         </div>
     </div>
+
+    <!-- عنصر الإشعار السريع (Toast Notification) -->
+    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
     <!-- نافذة منبثقة احتياطية للنسخ المباشر -->
     <div class="modal-overlay" id="reportModal">
@@ -328,27 +393,27 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // استرجاع السجلات السابقة
+        // استرجاع السجلات السابقة من ذاكرة الهاتف
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
             savedRecords = [];
         }
 
-        const userInput = document.getElementById('userName');
+        const userSelect = document.getElementById('userSelect');
         const trainInput = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
 
-        // استرجاع اسم المستخدم المحفوظ تلقائياً
-        const savedUserName = localStorage.getItem('user_name') || '';
-        if (savedUserName) {
-            userInput.value = savedUserName;
+        // استرجاع آخر اسم مستخدم تم اختياره تلقائياً
+        const savedUser = localStorage.getItem('selected_user') || '';
+        if (savedUser) {
+            userSelect.value = savedUser;
         }
 
-        userInput.addEventListener('input', function() {
+        userSelect.addEventListener('change', function() {
             this.classList.remove('error-highlight');
-            localStorage.setItem('user_name', this.value.trim());
+            localStorage.setItem('selected_user', this.value);
         });
 
         function updateCounter() {
@@ -369,7 +434,7 @@
             }
         });
 
-        // صيغة 24 ساعة
+        // دالة التوقيت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -396,6 +461,16 @@
             document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
+        // إظهار إشعار الحفظ السريع
+        function showToast(text) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = text;
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
         // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             trainInput.value = "";
@@ -414,17 +489,19 @@
 
         // حفظ القطار مع التحقق من جميع الحقول
         function saveRecord() {
-            const user = userInput.value.trim();
+            const user = userSelect.value;
             const trainNo = trainInput.value.trim();
 
+            // 1. التحقق من اختيار اسم المستخدم
             if (!user) {
-                userInput.classList.add('error-highlight');
-                userInput.focus();
-                alert("⚠️ Please enter User Name first!");
+                userSelect.classList.add('error-highlight');
+                userSelect.focus();
+                alert("⚠️ Please select User / Inspector Name first!");
                 document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
                 return;
             }
 
+            // 2. التحقق من رقم القطار (4 أرقام)
             if (!trainNo || trainNo.length < 4) {
                 trainInput.classList.add('error-highlight');
                 trainInput.focus();
@@ -433,6 +510,7 @@
                 return;
             }
 
+            // 3. التحقق من وقت الوصول
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
@@ -440,6 +518,7 @@
                 return;
             }
 
+            // 4. التحقق من وقت المغادرة
             if (!departureTime) {
                 departureBtn.classList.add('error-highlight');
                 alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
@@ -447,9 +526,10 @@
                 return;
             }
 
+            // حفظ السجل
             const newRecord = {
-                user: user,
                 date: formattedDate,
+                user: user,
                 trainNumber: trainNo,
                 arrival: arrivalTime,
                 departure: departureTime,
@@ -462,34 +542,35 @@
             } catch(e) {}
             
             updateCounter();
-            alert("✅ Train " + trainNo + " saved successfully! Total saved: " + savedRecords.length);
+            
+            // إظهار إشعار الحفظ السريع
+            showToast(`✅ Train ${trainNo} Saved! (${savedRecords.length})`);
             resetCurrentForm();
         }
 
-        // بناء نص التقرير بأسطر نظيفة
+        // إنشاء محتوى التقرير النصي بالترتيب: التاريخ -> الاسم -> رقم القطار -> الوصول -> المغادرة
         function buildReportText() {
-            const user = userInput.value.trim() || (savedRecords[0] ? savedRecords[0].user : "Operator");
-            let txt = "========================================\n";
-            txt += "      REGULARITY MEASUREMENT REPORT      \n";
-            txt += "      Inspector / User: " + user + "\n";
-            txt += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
-            txt += "========================================\n\n";
-            txt += "Date       | Train No | Arrival  | Departure\n";
-            txt += "----------------------------------------\n";
+            let txt = "========================================================================================\n";
+            txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
+            txt += "                              Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
+            txt += "========================================================================================\n\n";
+            txt += "Date       | Inspector / User                        | Train No | Arrival  | Departure\n";
+            txt += "----------------------------------------------------------------------------------------\n";
 
             savedRecords.forEach(function(item) {
                 const d = item.date.padEnd(10, ' ');
+                const u = item.user.padEnd(39, ' ');
                 const t = item.trainNumber.padEnd(8, ' ');
                 const a = item.arrival.padEnd(8, ' ');
                 const dep = item.departure.padEnd(8, ' ');
-                txt += d + " | " + t + " | " + a + " | " + dep + "\n";
+                txt += d + " | " + u + " | " + t + " | " + a + " | " + dep + "\n";
             });
 
-            txt += "\n========================================\n";
+            txt += "\n========================================================================================\n";
             return txt;
         }
 
-        // تنزيل ومشاركة الملف بأمان تام على كل الهواتف
+        // تصدير وتنزيل الملف
         async function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet! Please save at least one train.");
@@ -499,7 +580,7 @@
             const reportText = buildReportText();
             const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
 
-            // 1. استخدام خاصية المشاركة المباشرة للهواتف (Save to Files / Share)
+            // 1. المشاركة عبر نافذة الهاتف (Share Sheet)
             if (navigator.canShare && navigator.share) {
                 try {
                     const file = new File([reportText], fileName, { type: "text/plain" });
@@ -517,7 +598,7 @@
                 }
             }
 
-            // 2. تنزيل مباشر عبر Data URI المتوافق
+            // 2. تنزيل مباشر عبر Data URI
             try {
                 const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
                 const link = document.createElement("a");
@@ -533,7 +614,7 @@
                 console.error("Download error:", err);
             }
 
-            // 3. النافذة الاحتياطية لعرض ونسخ النص فوراً
+            // 3. النافذة الاحتياطية للنسخ الفوري
             document.getElementById('reportTextArea').value = reportText;
             document.getElementById('reportModal').style.display = 'flex';
         }
