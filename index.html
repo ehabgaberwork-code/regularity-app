@@ -101,7 +101,7 @@
             width: 100%;
             padding: 14px;
             font-size: 26px;
-            border: none;
+            border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
@@ -109,6 +109,7 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         .input-field::placeholder {
@@ -123,7 +124,7 @@
             width: 90%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: none;
+            border: 2px solid transparent;
             border-radius: 6px;
             padding: 16px 0;
             font-size: 20px;
@@ -144,6 +145,20 @@
             background-color: #e8f5e9;
             color: #1b5e20;
             border: 2px solid #81c784;
+        }
+
+        /* تأثير الخطأ / الحقل غير المكتمل */
+        .error-highlight {
+            border: 2px solid #ff5252 !important;
+            background-color: #ffebee !important;
+            color: #c62828 !important;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
         .btn-submit {
@@ -196,6 +211,8 @@
             font-size: 13px;
             color: #ffd54f;
             font-weight: 500;
+            min-height: 18px;
+            text-align: left;
         }
     </style>
 </head>
@@ -226,7 +243,7 @@
                 type="tel" 
                 id="trainNumber" 
                 class="input-field" 
-                placeholder="Enter Train Number" 
+                placeholder="Enter 4-digit Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*" 
@@ -278,9 +295,10 @@
 
         updateCounter();
 
-        // إدخال أرقام فقط وبحد أقصى 4 أرقام
+        // إدخال أرقام فقط وإزالة أي تنبيه خطأ فور الكتابة
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+            this.classList.remove('error-highlight');
             const val = this.value.trim();
             if (val.length > 0) {
                 document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
@@ -302,6 +320,7 @@
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
+            arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
@@ -310,6 +329,7 @@
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.remove('error-highlight');
             departureBtn.classList.add('recorded');
             document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
@@ -317,111 +337,34 @@
         // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             inputField.value = "";
+            inputField.classList.remove('error-highlight');
             arrivalTime = "";
             departureTime = "";
             
             arrivalBtn.innerText = "Train Arrival";
-            arrivalBtn.classList.remove('recorded');
+            arrivalBtn.classList.remove('recorded', 'error-highlight');
 
             departureBtn.innerText = "Train Departure";
-            departureBtn.classList.remove('recorded');
+            departureBtn.classList.remove('recorded', 'error-highlight');
 
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
-        // حفظ القطار محلياً في ذاكرة الهاتف
+        // حفظ القطار مع التحقق الصارم من اكتمال كافة الحقول
         function saveRecord() {
             const trainNo = inputField.value.trim();
 
-            if (!trainNo) {
-                alert("⚠️ Please enter a Train Number first!");
-                return;
-            }
-            if (!arrivalTime && !departureTime) {
-                alert("⚠️ Please record Arrival or Departure time before saving!");
-                return;
-            }
-
-            const newRecord = {
-                date: formattedDate,
-                trainNumber: trainNo,
-                arrival: arrivalTime || "N/A",
-                departure: departureTime || "N/A",
-                timestamp: get24HourTime()
-            };
-
-            savedRecords.push(newRecord);
-            try {
-                localStorage.setItem('train_records', JSON.stringify(savedRecords));
-            } catch(e) {}
-            
-            updateCounter();
-            alert("✅ Train " + trainNo + " saved locally! Total saved: " + savedRecords.length);
-            resetCurrentForm();
-        }
-
-        // تصدير وتنزيل ملف التكست بالترتيب: التاريخ -> رقم القطار -> وقت الوصول -> وقت المغادرة
-        function exportAllToTxt() {
-            if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet!");
+            // 1. التحقق من رقم القطار (أرقام موجودة وبطول 4 أرقام)
+            if (!trainNo || trainNo.length < 4) {
+                inputField.classList.add('error-highlight');
+                inputField.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number first!");
+                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
                 return;
             }
 
-            let fileContent = "========================================\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
-            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
-            fileContent += "========================================\n\n";
-            fileContent += "Date       | Train No | Arrival  | Departure\n";
-            fileContent += "----------------------------------------\n";
-
-            savedRecords.forEach(function(item) {
-                const dateFormatted = item.date.padEnd(10, ' ');
-                const trainFormatted = item.trainNumber.padEnd(8, ' ');
-                const arrFormatted = item.arrival.padEnd(8, ' ');
-                const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += dateFormatted + " | " + trainFormatted + " | " + arrFormatted + " | " + depFormatted + "\n";
-            });
-
-            fileContent += "\n========================================\n";
-
-            try {
-                const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-                
-                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
-                    window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
-                    return;
-                }
-
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_AllTrains.txt";
-                
-                link.href = url;
-                link.download = fileName;
-                link.target = "_blank";
-                
-                document.body.appendChild(link);
-                link.click();
-                
-                setTimeout(function() {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 100);
-
-                setTimeout(function() {
-                    if (confirm("✅ TXT report downloaded successfully!\n\nDo you want to clear the saved list to start fresh?")) {
-                        savedRecords = [];
-                        localStorage.removeItem('train_records');
-                        updateCounter();
-                        resetCurrentForm();
-                    }
-                }, 500);
-
-            } catch (err) {
-                console.error(err);
-                alert("❌ Download block encountered. Copying report instead:\n\n" + fileContent);
-            }
-        }
-    </script>
-</body>
-</html>
+            // 2. التحقق من تسجيل وقت الوصول
+            if (!arrivalTime) {
+                arrivalBtn.classList.add('error-highlight');
+                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train A
