@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-
-    <!-- تضمين مكتبة SheetJS لإنشاء ملفات XLSX حقيقية -->
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
     <style>
         :root {
             --bg-color: #005a79;
@@ -103,4 +99,97 @@
             transition: all 0.2s ease;
         }
         .input-field::placeholder {
-            color: #
+            color: #8c9ba5;
+            font-size: 15px;
+            letter-spacing: normal;
+            font-weight: normal;
+        }
+        .btn {
+            width: 90%;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 14px 0;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            text-align: center;
+            display: block;
+        }
+        .btn:active {
+            transform: scale(0.97);
+            background-color: #e0f2f1;
+        }
+        .btn.recorded {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            border: 2px solid #81c784;
+        }
+        .error-highlight {
+            border: 2px solid #ff5252 !important;
+            background-color: #ffebee !important;
+            color: #c62828 !important;
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+        .btn-submit { background-color: #2e7d32; color: #ffffff; margin-top: 3px; }
+        .btn-submit:active { background-color: #1b5e20; }
+        
+        .btn-share { 
+            background-color: #107c41; 
+            color: #ffffff; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-share:active { background-color: #0b582e; }
+
+        .btn-clear { background-color: #c62828; color: #ffffff; font-size: 14px; padding: 8px 0; width: 50%; }
+        .counter-badge {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #ffd54f;
+            margin-bottom: 2px;
+        }
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.85);
+            margin-top: 10px;
+        }
+        .status-msg {
+            font-size: 13px;
+            color: #ffd54f;
+            font-weight: 500;
+            min-height: 18px;
+            text-align: left;
+        }
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #1b5e20;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
