@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- مكتبة SheetJS لإنشاء ملفات الإكسل الحقيقية -->
+    <!-- مكتبة SheetJS لتصدير ملفات الإكسل الرسمية -->
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -70,6 +70,7 @@
             gap: 12px;
             width: 100%;
         }
+        /* قائمة اختيار اسم المستخدم */
         .select-field {
             width: 100%;
             padding: 13px;
@@ -85,6 +86,7 @@
             outline: none;
             transition: all 0.2s ease;
         }
+        /* حقل رقم القطار */
         .input-field {
             width: 100%;
             padding: 12px;
@@ -106,6 +108,7 @@
             letter-spacing: normal;
             font-weight: normal;
         }
+        /* أزرار التسجيل */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -130,6 +133,7 @@
             color: #1b5e20;
             border: 2px solid #81c784;
         }
+        /* تحديد الحقل غير المكتمل */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
@@ -149,16 +153,12 @@
         .btn-submit:active {
             background-color: #1b5e20;
         }
-        .btn-share {
-            background-color: #25D366; /* لون الواتساب والمشاركة */
+        .btn-export {
+            background-color: #107c41; /* لون إكسل المميز */
             color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
-        .btn-share:active {
-            background-color: #128C7E;
+        .btn-export:active {
+            background-color: #0c592e;
         }
         .btn-clear {
             background-color: #c62828;
@@ -181,7 +181,7 @@
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.85); /* تم تصحيح اللون هنا */
             margin-top: 10px;
         }
         .status-msg {
@@ -191,6 +191,7 @@
             min-height: 18px;
             text-align: left;
         }
+        /* إشعار الحفظ السريع المنبثق (Toast) */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -227,24 +228,37 @@
 
         <!-- Main Content -->
         <div class="content">
+            <!-- قائمة اختيار المفتش / المستخدم -->
             <select id="userSelect" class="select-field">
                 <option value="" disabled selected>👤 Select User / Inspector Name</option>
-                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
-                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
-                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
-                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
+                <option value="Fathy Helmy">Fathy Helmy</option>
+                <option value="Fattouh Hassan">Fattouh Hassan</option>
+                <option value="Karim Gamal">Karim Gamal</option>
+                <option value="Salah Al-Din">Salah Al-Din</option>
+                <option value="Karim Moustafa">Karim Moustafa</option>
+                <option value="Mostafa Khaled">Mostafa Khaled</option>
+                <option value="Mostafa Abdel Moneim">Mostafa Abdel Moneim</option>
                 <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
-                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
-                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
+                <option value="Shorouk Tarek">Shorouk Tarek</option>
+                <option value="Taha Yaseen">Taha Yaseen</option>
+                <option value="Mahmoud Taher">Mahmoud Taher</option>
+                <option value="Mahmoud Zaki">Mahmoud Zaki</option>
                 <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
-                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
-                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
-                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
-                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
-                <option value="Donia Samir Abdelrazek Ahmed">Donia Samir Abdelrazek Ahmed</option>
-                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
+                <option value="Nancy Hesham">Nancy Hesham</option>
+                <option value="Hassan Abdelrehim">Hassan Abdelrehim</option>
+                <option value="Nourhan Karam">Nourhan Karam</option>
+                <option value="Hanafy Mohamdy">Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam">Mohamed Emad Imam</option>
+                <option value="Mahmoud Ehab">Mahmoud Ehab</option>
+                <option value="Shabaan Fahmy">Shabaan Fahmy</option>
+                <option value="Elsayed Donia">Elsayed Donia</option>
+                <option value="Samir Abdelrazek">Samir Abdelrazek</option>
+                <option value="Ahmed Yasmine">Ahmed Yasmine</option>
+                <option value="Mohamed Alsayed">Mohamed Alsayed</option>
+                <option value="Abdelsattar Akila">Abdelsattar Akila</option>
             </select>
 
+            <!-- حقل رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
@@ -262,22 +276,22 @@
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-share" id="btnExport" type="button" onclick="shareExcelFile()">
-                <span>📤 Share Excel File (WhatsApp)</span>
-            </button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToExcel()">📤 Share / Export Excel (.xlsx)</button>
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 83 (Excel Share)</div>
+            <div>Ver 85 (Checked)</div>
         </div>
     </div>
 
+    <!-- عنصر الإشعار السريع (Toast Notification) -->
     <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
     <script>
+        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -286,6 +300,7 @@
         let departureTime = "";
         let savedRecords = [];
 
+        // استرجاع السجلات السابقة من الذاكرة المحلية
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -297,6 +312,7 @@
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
 
+        // استرجاع آخر اسم مستخدم تم اختياره تلقائياً
         const savedUser = localStorage.getItem('selected_user') || '';
         if (savedUser) {
             userSelect.value = savedUser;
@@ -312,6 +328,7 @@
         }
         updateCounter();
 
+        // إدخال أرقام فقط لرقم القطار
         trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
@@ -323,6 +340,7 @@
             }
         });
 
+        // دالة التوقيت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -331,6 +349,7 @@
             return h + ':' + m + ':' + s;
         }
 
+        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -339,6 +358,7 @@
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
+        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -347,6 +367,7 @@
             document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
+        // إظهار إشعار الحفظ السريع
         function showToast(text) {
             const toast = document.getElementById('toastMessage');
             toast.innerText = text;
@@ -356,6 +377,7 @@
             }, 2000);
         }
 
+        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -369,6 +391,7 @@
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
+        // حفظ القطار مع التحقق
         function saveRecord() {
             const user = userSelect.value;
             const trainNo = trainInput.value.trim();
@@ -418,71 +441,83 @@
             resetCurrentForm();
         }
 
-        // دالة إنشاء ومشاركة ملف Excel عبر نافذة التطبيقات (WhatsApp, Telegram, Mail...)
-        async function shareExcelFile() {
+        // دالة إنشاء ومشاركة وتنزيل ملف الإكسل (محدثة ومحصنة بالكامل)
+        async function exportAllToExcel() {
             if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to share yet! Please save at least one train.");
+                alert("⚠️ No saved trains to export yet! Please save at least one train.");
                 return;
             }
 
             const cleanDate = formattedDate.replace(/\//g, '-');
             const fileName = `Regularity_${cleanDate}_Report.xlsx`;
+            let fileBlob = null;
+            let mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-            // إعداد محتوى ملف الإكسل
-            const excelRows = savedRecords.map((item, index) => ({
-                "No.": index + 1,
-                "Date": item.date,
-                "Inspector / User Name": item.user,
-                "Train Number": item.trainNumber,
-                "Arrival Time": item.arrival,
-                "Departure Time": item.departure,
-                "Logged At": item.timestamp
-            }));
-
-            const worksheet = XLSX.utils.json_to_sheet(excelRows);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, "Regularity Report");
-
-            // تنسيق أحجام الأعمدة تلقائياً
-            worksheet['!cols'] = [
-                { wch: 6 },
-                { wch: 14 },
-                { wch: 35 },
-                { wch: 14 },
-                { wch: 14 },
-                { wch: 14 },
-                { wch: 12 }
-            ];
-
-            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const excelBlob = new Blob([wbout], { 
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-            });
-
-            // إنشاء ملف للمشاركة
-            const file = new File([excelBlob], fileName, { 
-                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
-            });
-
-            // 1. محاولة فتح قائمة المشاركة الأصلية في الهاتف (Share Sheet) لاختيار WhatsApp
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // 1. في حال توفر مكتبة SheetJS
+            if (typeof XLSX !== 'undefined') {
                 try {
-                    await navigator.share({
-                        files: [file],
-                        title: "Regularity Excel Report",
-                        text: `Regularity Measurement Report - Date: ${formattedDate} (${savedRecords.length} trains)`
-                    });
-                    promptReset();
-                    return;
-                } catch (e) {
-                    if (e.name === 'AbortError') return; // إذا قام المستخدم بإلغاء المشاركة
-                    console.warn("Share sheet failed, falling back to download", e);
+                    const excelRows = savedRecords.map((item, index) => ({
+                        "No.": index + 1,
+                        "Date": item.date,
+                        "Inspector / User Name": item.user,
+                        "Train Number": "'" + item.trainNumber, // حفظ رقم القطار كنص لحماية الأصفار
+                        "Arrival Time": item.arrival,
+                        "Departure Time": item.departure,
+                        "Logged At": item.timestamp
+                    }));
+
+                    const worksheet = XLSX.utils.json_to_sheet(excelRows);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Regularity Report");
+
+                    worksheet['!cols'] = [
+                        { wch: 6 },
+                        { wch: 14 },
+                        { wch: 30 },
+                        { wch: 15 },
+                        { wch: 15 },
+                        { wch: 15 },
+                        { wch: 14 }
+                    ];
+
+                    const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+                    fileBlob = new Blob([wbout], { type: mimeType });
+                } catch(err) {
+                    console.error("SheetJS generation error:", err);
                 }
             }
 
-            // 2. خيار احتياطي: تنزيل الملف مباشرة على الجهاز إذا لم يدعم المتصفح Share Sheet
+            // 2. خطة بديلة (Fallback) في حالة عدم وجود إنترنت وتحميل المكتبة
+            if (!fileBlob) {
+                let csvContent = "\uFEFFNo.,Date,Inspector / User Name,Train Number,Arrival Time,Departure Time,Logged At\n";
+                savedRecords.forEach((item, idx) => {
+                    csvContent += `${idx + 1},"${item.date}","${item.user}","${item.trainNumber}","${item.arrival}","${item.departure}","${item.timestamp}"\n`;
+                });
+                fileBlob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                mimeType = "text/csv";
+            }
+
+            // 3. المشاركة عبر نافذة الهاتف الأصلية (Share Sheet / WhatsApp)
+            if (navigator.share) {
+                try {
+                    const exportFile = new File([fileBlob], fileName, { type: mimeType });
+                    if (navigator.canShare && navigator.canShare({ files: [exportFile] })) {
+                        await navigator.share({
+                            files: [exportFile],
+                            title: "Regularity Excel Report",
+                            text: `Regularity Measurement Report - Date: ${formattedDate}`
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') return; // إذا تم الإلغاء من قِبل المستخدم
+                }
+            }
+
+            // 4. التنزيل المباشر كملف في حال تعذر فتح نافذة المشاركة
             try {
-                const url = URL.createObjectURL(excelBlob);
+                const url = URL.createObjectURL(fileBlob);
                 const a = document.createElement("a");
                 a.href = url;
                 a.download = fileName;
@@ -490,23 +525,22 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                alert("📥 File downloaded! You can now attach it to WhatsApp.");
                 promptReset();
             } catch (err) {
-                console.error("Export error:", err);
-                alert("Could not export file. Please try again.");
+                console.error("Export download failed:", err);
+                alert("Could not export file. Please check device permissions.");
             }
         }
 
         function promptReset() {
             setTimeout(function() {
-                if (confirm("✅ Done!\n\nDo you want to clear the list and start a new shift?")) {
+                if (confirm("✅ Report exported successfully!\n\nDo you want to clear the saved list to start a new shift?")) {
                     savedRecords = [];
                     localStorage.removeItem('train_records');
                     updateCounter();
                     resetCurrentForm();
                 }
-            }, 500);
+            }, 400);
         }
     </script>
 </body>
