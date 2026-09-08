@@ -29,7 +29,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 12px 20px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -69,14 +69,14 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 6px; 
+            margin-top: 6px;
             flex-grow: 1;
             justify-content: center;
             gap: 11px;
             width: 100%;
         }
 
-        /* Dropdown selector styling */
+        /* قائمة اختيار اسم المستخدم */
         .select-field {
             width: 100%;
             padding: 12px;
@@ -93,7 +93,7 @@
             transition: all 0.2s ease;
         }
 
-        /* Train Number Input - Custom Dialer-pad */
+        /* حقل رقم القطار */
         .input-field {
             width: 100%;
             padding: 12px;
@@ -117,7 +117,7 @@
             font-weight: normal;
         }
 
-        /* Interactive Buttons - ALWAYS VISIBLE */
+        /* الأزرار التفاعلية */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -131,7 +131,7 @@
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
             text-align: center;
-            display: block; /* Always displayed on screen */
+            display: block;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
@@ -147,7 +147,7 @@
             border: 2px solid #81c784;
         }
 
-        /* Error state styling */
+        /* تحديد الحقل غير المكتمل */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
@@ -215,7 +215,7 @@
             text-align: left;
         }
 
-        /* Toast message styling - 2 seconds auto fade away */
+        /* إشعار الحفظ السريع */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -258,7 +258,7 @@
 
         <!-- Main Content -->
         <div class="content">
-            <!-- Dropdown Menu of Inspectors -->
+            <!-- قائمة الأسماء المنسدلة -->
             <select id="userSelect" class="select-field">
                 <option value="" disabled selected>👤 Select User / Inspector Name</option>
                 <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
@@ -277,12 +277,12 @@
                 <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
             </select>
 
-            <!-- Train Input Field -->
+            <!-- حقل إدخال رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
                 class="input-field" 
-                placeholder="🚆 Enter Train Number" 
+                placeholder="Enter Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
                 pattern="[0-9]*" 
@@ -291,7 +291,7 @@
 
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- All Buttons are ALWAYS visible to guarantee functionality on all browsers -->
+            <!-- أزرار التسجيل والتحكم -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -302,15 +302,15 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 89</div>
+            <div>Ver 90</div>
         </div>
     </div>
 
-    <!-- Green Success Toast Notification -->
+    <!-- إشعار الحفظ الأخضر -->
     <div class="toast" id="toastMessage"></div>
 
     <script>
-        // Setup current date
+        // إعداد التاريخ
         const nowObj = new Date();
         const formattedDate = (nowObj.getMonth() + 1) + '/' + nowObj.getDate() + '/' + nowObj.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -319,7 +319,7 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // Safely restore previously saved records
+        // استرجاع السجلات السابقة من ذاكرة الهاتف
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -334,7 +334,7 @@
         const trainCounter = document.getElementById('trainCounter');
         const toastMessage = document.getElementById('toastMessage');
 
-        // Restore last chosen Inspector Name
+        // استرجاع آخر اسم مستخدم تم اختياره
         const savedUser = localStorage.getItem('selected_user') || '';
         if (savedUser) {
             userSelect.value = savedUser;
@@ -350,7 +350,7 @@
         }
         updateCounter();
 
-        // Numeric checking and clearing error border
+        // إدخال أرقام فقط لرقم القطار
         trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
@@ -362,7 +362,7 @@
             }
         });
 
-        // 24-Hour time formatter
+        // دالة التوقيت بصيغة 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -371,7 +371,7 @@
             return h + ':' + m + ':' + s;
         }
 
-        // Tap Train Arrival
+        // 1. تسجيل وقت الوصول
         window.handleArrival = function() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -380,7 +380,7 @@
             statusMsg.innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
         };
 
-        // Tap Train Departure
+        // 2. تسجيل وقت المغادرة
         window.handleDeparture = function() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -389,7 +389,7 @@
             statusMsg.innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
         };
 
-        // Green Success Banner
+        // إظهار إشعار الحفظ السريع
         function showToast(text) {
             toastMessage.innerText = text;
             toastMessage.classList.add('show');
@@ -398,7 +398,7 @@
             }, 2000);
         }
 
-        // Reset current fields
+        // مسح الحقول للقطار التالي
         window.resetCurrentForm = function() {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -414,12 +414,12 @@
             statusMsg.innerText = "Enter Train Number & Tap Buttons...";
         };
 
-        // Strict Save Record function
+        // 3. حفظ بيانات القطار
         window.saveRecord = function() {
             const user = userSelect.value;
             const trainNo = trainInput.value.trim();
 
-            // 1. Validate Dropdown Name
+            // التحقق من الاسم
             if (!user) {
                 userSelect.classList.add('error-highlight');
                 userSelect.focus();
@@ -428,134 +428,8 @@
                 return;
             }
 
-            // 2. Validate Train Number (exactly 4 digits)
+            // التحقق من رقم القطار (4 أرقام)
             if (!trainNo || trainNo.length < 4) {
                 trainInput.classList.add('error-highlight');
                 trainInput.focus();
-                alert("⚠️ Please enter a complete 4-digit Train Number!");
-                statusMsg.innerText = "⚠️ Train Number must be 4 digits!";
-                return;
-            }
-
-            // 3. Verify Arrival registration
-            if (!arrivalTime) {
-                arrivalBtn.classList.add('error-highlight');
-                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
-                statusMsg.innerText = "⚠️ Please record Train Arrival time!";
-                return;
-            }
-
-            // 4. Verify Departure registration
-            if (!departureTime) {
-                departureBtn.classList.add('error-highlight');
-                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
-                statusMsg.innerText = "⚠️ Please record Train Departure time!";
-                return;
-            }
-
-            const newRecord = {
-                date: formattedDate,
-                user: user,
-                trainNumber: trainNo,
-                arrival: arrivalTime,
-                departure: departureTime,
-                timestamp: get24HourTime()
-            };
-
-            savedRecords.push(newRecord);
-            try {
-                localStorage.setItem('train_records', JSON.stringify(savedRecords));
-            } catch(e) {}
-            
-            updateCounter();
-            showToast("✅ Train " + trainNo + " Saved Successfully!");
-            resetCurrentForm();
-        };
-
-        // Build report with actual correct linebreaks and columns order: Date | User | Train No | Arrival | Departure
-        function buildReportText() {
-            let txt = "========================================================================================\\n";
-            txt += "                              REGULARITY MEASUREMENT REPORT                              \\n";
-            txt += "                              Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\\n";
-            txt += "========================================================================================\\n\\n";
-            txt += "Date       | Inspector / User                        | Train No | Arrival  | Departure\\n";
-            txt += "----------------------------------------------------------------------------------------\\n";
-
-            savedRecords.forEach(function(item) {
-                const d = item.date.padEnd(10, ' ');
-                const u = item.user.padEnd(39, ' ');
-                const t = item.trainNumber.padEnd(8, ' ');
-                const a = item.arrival.padEnd(8, ' ');
-                const dep = item.departure.padEnd(8, ' ');
-                txt += d + " | " + u + " | " + t + " | " + a + " | " + dep + "\\n";
-            });
-
-            txt += "\\n========================================================================================\\n";
-            return txt;
-        }
-
-        // Bulletproof high-compatibility download/share handler
-        window.exportAllToTxt = async function() {
-            if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet! Please save at least one train.");
-                return;
-            }
-
-            const reportText = buildReportText();
-            const cleanContent = reportText.replace(/\\\\n/g, '\\n');
-            const fileName = "Regularity_" + formattedDate.replace(/\\//g, '-') + "_Report.txt";
-
-            // Safe Direct share sheet (Share directly to files, WhatsApp, Mail, etc.)
-            if (navigator.canShare && navigator.share) {
-                try {
-                    const file = new File([cleanContent], fileName, { type: "text/plain" });
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: "Regularity Report",
-                            text: "Regularity Report for " + formattedDate
-                        });
-                        promptReset();
-                        return;
-                    }
-                } catch (e) {
-                    if (e.name === 'AbortError') return;
-                }
-            }
-
-            // High compatibility direct file download
-            try {
-                const blob = new Blob([cleanContent], { type: "text/plain;charset=utf-8" });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = fileName;
-                link.target = "_blank";
-                document.body.appendChild(link);
-                link.click();
-                setTimeout(function() {
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 300);
-                promptReset();
-                return;
-            } catch (err) {
-                console.error("Download failed:", err);
-                alert("❌ Download blocked. Copying text report to clipboard instead!");
-                navigator.clipboard.writeText(cleanContent);
-            }
-        };
-
-        function promptReset() {
-            setTimeout(function() {
-                if (confirm("✅ Report exported!\\n\\nDo you want to clear the saved list to start fresh?")) {
-                    savedRecords = [];
-                    localStorage.removeItem('train_records');
-                    updateCounter();
-                    resetCurrentForm();
-                }
-            }, 600);
-        }
-    </script>
-</body>
-</html>
+           
