@@ -141,8 +141,18 @@
         }
         .btn-submit { background-color: #2e7d32; color: #ffffff; margin-top: 3px; }
         .btn-submit:active { background-color: #1b5e20; }
-        .btn-export { background-color: #1d6f42; color: #ffffff; } /* Excel Green */
-        .btn-export:active { background-color: #144d2e; }
+        
+        /* زر الشير المباشر */
+        .btn-share { 
+            background-color: #1d6f42; 
+            color: #ffffff; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-share:active { background-color: #144d2e; }
+
         .btn-clear { background-color: #c62828; color: #ffffff; font-size: 14px; padding: 8px 0; width: 50%; }
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
@@ -189,6 +199,8 @@
             pointer-events: none;
         }
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        
+        /* نافذة بديلة فقط للأجهزة غير الداعمة للمشاركة */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -214,7 +226,7 @@
         }
         .modal-card textarea {
             width: 100%;
-            height: 180px;
+            height: 150px;
             font-family: monospace;
             font-size: 12px;
             padding: 8px;
@@ -228,10 +240,11 @@
             border: none;
             border-radius: 6px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 15px;
             cursor: pointer;
         }
-        .modal-btn.copy { background-color: #1d6f42; color: #ffffff; }
+        .modal-btn.whatsapp { background-color: #25D366; color: #ffffff; }
+        .modal-btn.copy { background-color: #005a79; color: #ffffff; }
         .modal-btn.close { background-color: #e0e0e0; color: #333; }
     </style>
 </head>
@@ -279,14 +292,19 @@
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToExcel()">📊 Download / Share (Excel CSV)</button>
+            
+            <!-- زر المشاركة المباشرة بدون تنزيل -->
+            <button class="btn btn-share" id="btnShare" type="button" onclick="shareDirectToExcel()">
+                📤 Share Excel File Directly
+            </button>
+            
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 82</div>
+            <div>Ver 83</div>
         </div>
     </div>
 
@@ -296,9 +314,10 @@
     <!-- Fallback Modal -->
     <div class="modal-overlay" id="reportModal">
         <div class="modal-card">
-            <h3 style="margin:0; text-align:center; color:#1d6f42;">📊 Excel CSV Ready</h3>
+            <h3 style="margin:0; text-align:center; color:#005a79;">📲 Direct Share Options</h3>
             <textarea id="reportTextArea" readonly></textarea>
-            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy CSV Data</button>
+            <button class="modal-btn whatsapp" onclick="shareViaWhatsAppText()">💬 Share on WhatsApp</button>
+            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy All Data</button>
             <button class="modal-btn close" onclick="closeModal()">Close</button>
         </div>
     </div>
@@ -448,7 +467,7 @@
             resetCurrentForm();
         }
 
-        // إنشاء محتوى ملف CSV متوافق بالكامل مع Excel
+        // بناء محتوى CSV متوافق مع Excel
         function buildCsvContent() {
             const headers = ["Date", "Inspector / User", "Train Number", "Arrival Time", "Departure Time", "Logged At"];
             const rows = savedRecords.map(item => [
@@ -459,26 +478,26 @@
                 `"${item.departure}"`,
                 `"${item.timestamp}"`
             ]);
-
             return [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
         }
 
-        // تصدير وتنزيل ملف Excel CSV
-        async function exportAllToExcel() {
+        // مشاركة مباشرة فقط عبر الهاتف بدون أي تنزيل للملف
+        async function shareDirectToExcel() {
             if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to export yet! Please save at least one train.");
+                alert("⚠️ No saved trains to share yet! Please save at least one train.");
                 return;
             }
 
-            // إضافة UTF-8 BOM لضمان فتح الحروف بشكل سليم في Excel
             const csvData = "\uFEFF" + buildCsvContent();
             const fileName = `Regularity_${formattedDate.replace(/\//g, '-')}_Report.csv`;
 
-            // 1. مشاركة عبر Share Sheet الموبايل (WhatsApp / Outlook / Drive)
-            if (navigator.canShare && navigator.share) {
+            // 1. استخدام نافذة المشاركة الأصلية للهاتف (Web Share API)
+            if (navigator.share) {
                 try {
                     const file = new File([csvData], fileName, { type: "text/csv;charset=utf-8;" });
-                    if (navigator.canShare({ files: [file] })) {
+                    
+                    // التحقق من إمكانية مشاركة الملفات مباشرة
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         await navigator.share({
                             files: [file],
                             title: "Regularity Excel Report",
@@ -486,33 +505,32 @@
                         });
                         promptReset();
                         return;
+                    } else {
+                        // في حال عدم دعم مشاركة الملف المباشر، يتم مشاركة النص كبيانات
+                        await navigator.share({
+                            title: "Regularity Report",
+                            text: buildCsvContent()
+                        });
+                        promptReset();
+                        return;
                     }
                 } catch (e) {
+                    // إذا قام المستخدم بإلغاء نافذة المشاركة
                     if (e.name === 'AbortError') return;
+                    console.error("Share error:", e);
                 }
             }
 
-            // 2. تنزيل مباشر في المتصفح بصيغة CSV
-            try {
-                const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", fileName);
-                link.style.display = "none";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                promptReset();
-                return;
-            } catch (err) {
-                console.error("Export error:", err);
-            }
-
-            // 3. نافذة احتياطية لنسخ البيانات
+            // 2. البديل للأجهزة غير الداعمة (تفتح نافذة لاختيار الواتساب أو النسخ)
             document.getElementById('reportTextArea').value = buildCsvContent();
             document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        // إرسال مباشر إلى تطبيق واتساب كنص
+        function shareViaWhatsAppText() {
+            const text = encodeURIComponent(buildCsvContent());
+            window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank');
+            closeModal();
         }
 
         function copyReportText() {
@@ -530,7 +548,7 @@
 
         function promptReset() {
             setTimeout(function() {
-                if (confirm("✅ Excel file exported!\n\nDo you want to clear the saved list to start a new shift?")) {
+                if (confirm("✅ Report shared!\n\nDo you want to clear the saved list to start a new shift?")) {
                     savedRecords = [];
                     localStorage.removeItem('train_records');
                     updateCounter();
