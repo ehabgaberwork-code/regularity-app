@@ -96,7 +96,7 @@
             margin: 0 0 5px 0;
         }
 
-        /* حقل إدخال رقم القطار - كيبورد أرقام فقط */
+        /* Train Number Input - Custom Dialer-pad */
         .input-field {
             width: 100%;
             padding: 14px;
@@ -119,7 +119,7 @@
             font-weight: normal;
         }
 
-        /* أزرار التسجيل */
+        /* Interactive Buttons */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -147,7 +147,7 @@
             border: 2px solid #81c784;
         }
 
-        /* تأثير الخطأ / الحقل غير المكتمل */
+        /* Error state styling */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
@@ -211,8 +211,6 @@
             font-size: 13px;
             color: #ffd54f;
             font-weight: 500;
-            min-height: 18px;
-            text-align: left;
         }
     </style>
 </head>
@@ -238,19 +236,19 @@
             
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- حقل إدخال رقم القطار -->
+            <!-- Train Input field -->
             <input 
                 type="tel" 
                 id="trainNumber" 
                 class="input-field" 
-                placeholder="Enter 4-digit Train Number" 
+                placeholder="Enter Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*" 
+                pattern="[0-9]*"
                 autocomplete="off"
             />
 
-            <!-- الأزرار الأساسية -->
+            <!-- All buttons are fully visible and active with absolutely zero display hidden states -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -266,7 +264,6 @@
     </div>
 
     <script>
-        // إظهار تاريخ اليوم تلقائياً
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -275,7 +272,6 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // استرجاع السجلات السابقة من ذاكرة الهاتف
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -295,19 +291,18 @@
 
         updateCounter();
 
-        // إدخال أرقام فقط وإزالة أي تنبيه خطأ فور الكتابة
+        // Prevent non-digits and cap at 4 characters
         inputField.addEventListener('input', function() {
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             this.classList.remove('error-highlight');
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
             if (val.length > 0) {
-                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
+                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
             } else {
                 document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
             }
         });
 
-        // صيغة الوقت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -316,25 +311,22 @@
             return h + ':' + m + ':' + s;
         }
 
-        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
+            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
         }
 
-        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
             departureBtn.classList.remove('error-highlight');
             departureBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
+            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
         }
 
-        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             inputField.value = "";
             inputField.classList.remove('error-highlight');
@@ -350,11 +342,10 @@
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
-        // حفظ القطار مع التحقق الصارم من اكتمال كافة الحقول
         function saveRecord() {
             const trainNo = inputField.value.trim();
 
-            // 1. التحقق من رقم القطار (أرقام موجودة وبطول 4 أرقام)
+            // 1. Validate Train Number (must be exactly 4 digits)
             if (!trainNo || trainNo.length < 4) {
                 inputField.classList.add('error-highlight');
                 inputField.focus();
@@ -363,8 +354,102 @@
                 return;
             }
 
-            // 2. التحقق من تسجيل وقت الوصول
+            // 2. Validate Train Arrival Time
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
-                document.getElementById('statusMessage').innerText = "⚠️ Please record Train A
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
+                return;
+            }
+
+            // 3. Validate Train Departure Time
+            if (!departureTime) {
+                departureBtn.classList.add('error-highlight');
+                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
+                return;
+            }
+
+            // If all fields are fully completed
+            const newRecord = {
+                date: formattedDate,
+                trainNumber: trainNo,
+                arrival: arrivalTime,
+                departure: departureTime,
+                timestamp: get24HourTime()
+            };
+
+            savedRecords.push(newRecord);
+            try {
+                localStorage.setItem('train_records', JSON.stringify(savedRecords));
+            } catch(e) {}
+            
+            updateCounter();
+            alert("✅ Train " + trainNo + " saved successfully! Total saved: " + savedRecords.length);
+            resetCurrentForm();
+        }
+
+        function exportAllToTxt() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to download yet!");
+                return;
+            }
+
+            let fileContent = "========================================\\n";
+            fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
+            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\\n";
+            fileContent += "========================================\\n\\n";
+            fileContent += "Date       | Train No | Arrival  | Departure\\n";
+            fileContent += "----------------------------------------\\n";
+
+            savedRecords.forEach(function(item) {
+                const dateFormatted = item.date.padEnd(10, ' ');
+                const trainFormatted = item.trainNumber.padEnd(8, ' ');
+                const arrFormatted = item.arrival.padEnd(8, ' ');
+                const depFormatted = item.departure.padEnd(8, ' ');
+                fileContent += dateFormatted + " | " + trainFormatted + " | " + arrFormatted + " | " + depFormatted + "\\n";
+            });
+
+            fileContent += "\\n========================================\\n";
+
+            try {
+                const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+                
+                if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+                    window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
+                    return;
+                }
+
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                const fileName = "Regularity_" + formattedDate.replace(/\\//g, '-') + "_AllTrains.txt";
+                
+                link.href = url;
+                link.download = fileName;
+                link.target = "_blank";
+                
+                document.body.appendChild(link);
+                link.click();
+                
+                setTimeout(function() {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+
+                setTimeout(function() {
+                    if (confirm("✅ TXT report downloaded successfully!\\n\\nDo you want to clear the saved list to start fresh?")) {
+                        savedRecords = [];
+                        localStorage.removeItem('train_records');
+                        updateCounter();
+                        resetCurrentForm();
+                    }
+                }, 500);
+
+            } catch (err) {
+                console.error(err);
+                alert("❌ Download block encountered. Copying report instead:\\n\\n" + fileContent);
+            }
+        }
+    </script>
+</body>
+</html>
