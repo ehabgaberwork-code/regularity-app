@@ -101,7 +101,7 @@
             width: 100%;
             padding: 14px;
             font-size: 26px;
-            border: none;
+            border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
@@ -109,6 +109,7 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
+            transition: all 0.2s ease;
         }
 
         .input-field::placeholder {
@@ -123,7 +124,7 @@
             width: 90%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: none;
+            border: 2px solid transparent;
             border-radius: 6px;
             padding: 16px 0;
             font-size: 20px;
@@ -144,6 +145,20 @@
             background-color: #e8f5e9;
             color: #1b5e20;
             border: 2px solid #81c784;
+        }
+
+        /* Error state styling */
+        .error-highlight {
+            border: 2px solid #ff5252 !important;
+            background-color: #ffebee !important;
+            color: #c62828 !important;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
         }
 
         .btn-submit {
@@ -233,7 +248,7 @@
                 autocomplete="off"
             />
 
-            <!-- Always visible buttons to prevent rendering issues -->
+            <!-- All buttons are fully visible and active with absolutely zero display hidden states -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -255,12 +270,13 @@
 
         let arrivalTime = "";
         let departureTime = "";
-        
         let savedRecords = [];
+
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
-        } catch(e) { savedRecords = []; }
-        updateCounter();
+        } catch(e) {
+            savedRecords = [];
+        }
 
         const inputField = document.getElementById('trainNumber');
         const arrivalBtn = document.getElementById('btnArrival');
@@ -269,18 +285,24 @@
         const exportBtn = document.getElementById('btnExport');
         const clearBtn = document.getElementById('btnClear');
 
-        // Prevent non-digits and limit to 4 characters
+        function updateCounter() {
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+        }
+
+        updateCounter();
+
+        // Prevent non-digits and cap at 4 characters
         inputField.addEventListener('input', function() {
+            this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
             if (val.length > 0) {
-                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
+                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
             } else {
                 document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
             }
         });
 
-        // 24-Hour time
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -292,31 +314,30 @@
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
+            arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
+            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
         }
 
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.remove('error-highlight');
             departureBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
-        }
-
-        function updateCounter() {
-            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
         }
 
         function resetCurrentForm() {
             inputField.value = "";
+            inputField.classList.remove('error-highlight');
             arrivalTime = "";
             departureTime = "";
             
             arrivalBtn.innerText = "Train Arrival";
-            arrivalBtn.classList.remove('recorded');
+            arrivalBtn.classList.remove('recorded', 'error-highlight');
 
             departureBtn.innerText = "Train Departure";
-            departureBtn.classList.remove('recorded');
+            departureBtn.classList.remove('recorded', 'error-highlight');
 
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
@@ -324,20 +345,37 @@
         function saveRecord() {
             const trainNo = inputField.value.trim();
 
-            if (!trainNo) {
-                alert("⚠️ Please enter a Train Number first!");
-                return;
-            }
-            if (!arrivalTime && !departureTime) {
-                alert("⚠️ Please record Arrival or Departure time before saving!");
+            // 1. Validate Train Number (must be exactly 4 digits)
+            if (!trainNo || trainNo.length < 4) {
+                inputField.classList.add('error-highlight');
+                inputField.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number first!");
+                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
                 return;
             }
 
+            // 2. Validate Train Arrival Time
+            if (!arrivalTime) {
+                arrivalBtn.classList.add('error-highlight');
+                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
+                return;
+            }
+
+            // 3. Validate Train Departure Time
+            if (!departureTime) {
+                departureBtn.classList.add('error-highlight');
+                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
+                return;
+            }
+
+            // If all fields are fully completed
             const newRecord = {
                 date: formattedDate,
                 trainNumber: trainNo,
-                arrival: arrivalTime || "N/A",
-                departure: departureTime || "N/A",
+                arrival: arrivalTime,
+                departure: departureTime,
                 timestamp: get24HourTime()
             };
 
@@ -347,38 +385,36 @@
             } catch(e) {}
             
             updateCounter();
-            alert("✅ Train " + trainNo + " saved locally! Total saved: " + savedRecords.length);
+            alert("✅ Train " + trainNo + " saved successfully! Total saved: " + savedRecords.length);
             resetCurrentForm();
         }
 
-        // Multi-browser compatible file download (handles iOS Safari and Android Chrome sandbox blocks)
         function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet!");
                 return;
             }
 
-            let fileContent = "========================================\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
-            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
-            fileContent += "========================================\n\n";
-            fileContent += "Train No | Date       | Arrival  | Departure\n";
-            fileContent += "----------------------------------------\n";
+            let fileContent = "========================================\\n";
+            fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
+            fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\\n";
+            fileContent += "========================================\\n\\n";
+            fileContent += "Date       | Train No | Arrival  | Departure\\n";
+            fileContent += "----------------------------------------\\n";
 
             savedRecords.forEach(function(item) {
-                const trainFormatted = item.trainNumber.padEnd(8, ' ');
                 const dateFormatted = item.date.padEnd(10, ' ');
+                const trainFormatted = item.trainNumber.padEnd(8, ' ');
                 const arrFormatted = item.arrival.padEnd(8, ' ');
                 const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += trainFormatted + " | " + dateFormatted + " | " + arrFormatted + " | " + depFormatted + "\n";
+                fileContent += dateFormatted + " | " + trainFormatted + " | " + arrFormatted + " | " + depFormatted + "\\n";
             });
 
-            fileContent += "\n========================================\n";
+            fileContent += "\\n========================================\\n";
 
             try {
                 const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
                 
-                // Fallback for Internet Explorer
                 if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                     window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
                     return;
@@ -386,23 +422,22 @@
 
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement("a");
-                const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_AllTrains.txt";
+                const fileName = "Regularity_" + formattedDate.replace(/\\//g, '-') + "_AllTrains.txt";
                 
                 link.href = url;
                 link.download = fileName;
-                link.target = "_blank"; // Crucial parameter to force open download dialog in iOS Safari & Chrome WebViews
+                link.target = "_blank";
                 
                 document.body.appendChild(link);
                 link.click();
                 
-                // Keep the link for a split second before removing to ensure trigger succeeds
                 setTimeout(function() {
                     document.body.removeChild(link);
                     URL.revokeObjectURL(url);
                 }, 100);
 
                 setTimeout(function() {
-                    if (confirm("✅ TXT report downloaded successfully!\n\nDo you want to clear the saved list to start fresh?")) {
+                    if (confirm("✅ TXT report downloaded successfully!\\n\\nDo you want to clear the saved list to start fresh?")) {
                         savedRecords = [];
                         localStorage.removeItem('train_records');
                         updateCounter();
@@ -412,7 +447,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert("❌ Download block encountered. Copying report instead:\n\n" + fileContent);
+                alert("❌ Download block encountered. Copying report instead:\\n\\n" + fileContent);
             }
         }
     </script>
