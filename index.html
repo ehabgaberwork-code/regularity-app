@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
+    <!-- تضمين مكتبة SheetJS لإنشاء وتصدير ملفات Excel الحقيقية -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --bg-color: #005a79;
@@ -71,7 +73,7 @@
         .select-field {
             width: 100%;
             padding: 13px;
-            font-size: 16px;
+            font-size: 17px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -110,8 +112,8 @@
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 14px 0;
-            font-size: 18px;
+            padding: 15px 0;
+            font-size: 19px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -139,20 +141,28 @@
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
-        .btn-submit { background-color: #2e7d32; color: #ffffff; margin-top: 3px; }
-        .btn-submit:active { background-color: #1b5e20; }
-        
-        .btn-share { 
-            background-color: #107c41; 
-            color: #ffffff; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+        .btn-submit {
+            background-color: #2e7d32;
+            color: #ffffff;
+            margin-top: 3px;
         }
-        .btn-share:active { background-color: #0b582e; }
-
-        .btn-clear { background-color: #c62828; color: #ffffff; font-size: 14px; padding: 8px 0; width: 50%; }
+        .btn-submit:active {
+            background-color: #1b5e20;
+        }
+        .btn-export {
+            background-color: #107c41; /* لون أخضر إكسل المميز */
+            color: #ffffff;
+        }
+        .btn-export:active {
+            background-color: #0c592e;
+        }
+        .btn-clear {
+            background-color: #c62828;
+            color: #ffffff;
+            font-size: 14px;
+            padding: 8px 0;
+            width: 50%;
+        }
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
             padding: 4px 12px;
@@ -193,3 +203,262 @@
             align-items: center;
             gap: 8px;
             opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            pointer-events: none;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-title">Regularity Measurement</div>
+            <div class="date-display" id="currentDate"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <select id="userSelect" class="select-field">
+                <option value="" disabled selected>👤 Select User / Inspector Name</option>
+                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
+                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
+                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
+                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
+                <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
+                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
+                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
+                <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
+                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
+                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
+                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
+                <option value="Donia Samir Abdelrazek Ahmed">Donia Samir Abdelrazek Ahmed</option>
+                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
+            </select>
+
+            <input 
+                type="tel" 
+                id="trainNumber" 
+                class="input-field" 
+                placeholder="🚆 Train Number (4 digits)" 
+                maxlength="4" 
+                inputmode="numeric" 
+                pattern="[0-9]*" 
+                autocomplete="off"
+            />
+
+            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+
+            <!-- أزرار التسجيل -->
+            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToExcel()">📊 Download / Share (Excel)</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
+            <div>Ver 82 (Excel)</div>
+        </div>
+    </div>
+
+    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
+
+    <script>
+        // ضبط تاريخ اليوم
+        const today = new Date();
+        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+        document.getElementById('currentDate').innerText = formattedDate;
+
+        let arrivalTime = "";
+        let departureTime = "";
+        let savedRecords = [];
+
+        try {
+            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        } catch(e) {
+            savedRecords = [];
+        }
+
+        const userSelect = document.getElementById('userSelect');
+        const trainInput = document.getElementById('trainNumber');
+        const arrivalBtn = document.getElementById('btnArrival');
+        const departureBtn = document.getElementById('btnDeparture');
+
+        const savedUser = localStorage.getItem('selected_user') || '';
+        if (savedUser) {
+            userSelect.value = savedUser;
+        }
+
+        userSelect.addEventListener('change', function() {
+            this.classList.remove('error-highlight');
+            localStorage.setItem('selected_user', this.value);
+        });
+
+        function updateCounter() {
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+        }
+        updateCounter();
+
+        trainInput.addEventListener('input', function() {
+            this.classList.remove('error-highlight');
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+            const val = this.value.trim();
+            if (val.length > 0) {
+                document.getElementById('statusMessage').innerText = `Train ${val} entered. Tap 'Train Arrival' next.`;
+            } else {
+                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
+            }
+        });
+
+        function get24HourTime() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return h + ':' + m + ':' + s;
+        }
+
+        function handleArrival() {
+            arrivalTime = get24HourTime();
+            arrivalBtn.innerText = "Arrival: " + arrivalTime;
+            arrivalBtn.classList.remove('error-highlight');
+            arrivalBtn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
+        }
+
+        function handleDeparture() {
+            departureTime = get24HourTime();
+            departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.remove('error-highlight');
+            departureBtn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
+        }
+
+        function showToast(text) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = text;
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        function resetCurrentForm() {
+            trainInput.value = "";
+            trainInput.classList.remove('error-highlight');
+            arrivalTime = "";
+            departureTime = "";
+            
+            arrivalBtn.innerText = "Train Arrival";
+            arrivalBtn.classList.remove('recorded', 'error-highlight');
+            departureBtn.innerText = "Train Departure";
+            departureBtn.classList.remove('recorded', 'error-highlight');
+            document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
+        }
+
+        function saveRecord() {
+            const user = userSelect.value;
+            const trainNo = trainInput.value.trim();
+
+            if (!user) {
+                userSelect.classList.add('error-highlight');
+                userSelect.focus();
+                alert("⚠️ Please select User / Inspector Name first!");
+                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
+                return;
+            }
+
+            if (!trainNo || trainNo.length < 4) {
+                trainInput.classList.add('error-highlight');
+                trainInput.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number!");
+                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
+                return;
+            }
+
+            if (!arrivalTime) {
+                arrivalBtn.classList.add('error-highlight');
+                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
+                return;
+            }
+
+            if (!departureTime) {
+                departureBtn.classList.add('error-highlight');
+                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
+                return;
+            }
+
+            const newRecord = {
+                date: formattedDate,
+                user: user,
+                trainNumber: trainNo,
+                arrival: arrivalTime,
+                departure: departureTime,
+                timestamp: get24HourTime()
+            };
+
+            savedRecords.push(newRecord);
+            try {
+                localStorage.setItem('train_records', JSON.stringify(savedRecords));
+            } catch(e) {}
+            
+            updateCounter();
+            showToast(`✅ Train ${trainNo} Saved! (${savedRecords.length})`);
+            resetCurrentForm();
+        }
+
+        // تحضير وتصدير ملف Excel بصيغة .xlsx ومشاركته
+        async function exportAllToExcel() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to download yet! Please save at least one train.");
+                return;
+            }
+
+            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.xlsx";
+
+            // تجهيز البيانات كجدول منظم
+            const excelRows = savedRecords.map((item, index) => ({
+                "No.": index + 1,
+                "Date": item.date,
+                "Inspector / User Name": item.user,
+                "Train Number": item.trainNumber,
+                "Arrival Time": item.arrival,
+                "Departure Time": item.departure,
+                "Logged At": item.timestamp
+            }));
+
+            // إنشاء ملف العمل والمصنف
+            const worksheet = XLSX.utils.json_to_sheet(excelRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Regularity Report");
+
+            // تعديل عرض الأعمدة تلقائياً ليكون مناسباً
+            worksheet['!cols'] = [
+                { wch: 6 },  // No.
+                { wch: 14 }, // Date
+                { wch: 35 }, // User Name
+                { wch: 14 }, // Train No
+                { wch: 14 }, // Arrival
+                { wch: 14 }, // Departure
+                { wch: 12 }  // Timestamp
+            ];
+
+            // تحويل الملف إلى مصفوفة بايتات (ArrayBuffer)
+            const wbout = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([wbout], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+
+            // 1. المشاركة عبر نافذة الهاتف (Share Sheet) كملف Excel حقيقي
+            if (navigator.canShare && navigator.share) {
+                try {
+                    const file = new File([blob], fileName, { 
+                        type: "application/vnd.openxmlformats-officedocumen
