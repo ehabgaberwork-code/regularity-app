@@ -96,7 +96,7 @@
             margin: 0 0 5px 0;
         }
 
-        /* حقل إدخال رقم القطار - كيبورد أرقام فقط */
+        /* Train Number Input - Custom Dialer-pad */
         .input-field {
             width: 100%;
             padding: 14px;
@@ -118,7 +118,7 @@
             font-weight: normal;
         }
 
-        /* أزرار التسجيل */
+        /* Interactive Buttons */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
@@ -221,7 +221,7 @@
             
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- حقل إدخال رقم القطار -->
+            <!-- Train Input field -->
             <input 
                 type="tel" 
                 id="trainNumber" 
@@ -233,7 +233,7 @@
                 autocomplete="off"
             />
 
-            <!-- الأزرار -->
+            <!-- Always visible buttons to prevent rendering issues -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -269,7 +269,7 @@
         const exportBtn = document.getElementById('btnExport');
         const clearBtn = document.getElementById('btnClear');
 
-        // منع إدخال أي شيء غير أرقام وقصرها على 4 أرقام
+        // Prevent non-digits and limit to 4 characters
         inputField.addEventListener('input', function() {
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
             const val = this.value.trim();
@@ -280,7 +280,7 @@
             }
         });
 
-        // صيغة 24 ساعة (HH:MM:SS)
+        // 24-Hour time
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -289,7 +289,6 @@
             return h + ':' + m + ':' + s;
         }
 
-        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -297,7 +296,6 @@
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
-        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -309,7 +307,6 @@
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
 
-        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             inputField.value = "";
             arrivalTime = "";
@@ -324,7 +321,6 @@
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
-        // حفظ بيانات القطار في الذاكرة
         function saveRecord() {
             const trainNo = inputField.value.trim();
 
@@ -355,7 +351,7 @@
             resetCurrentForm();
         }
 
-        // تصدير وتنزيل ملف التكست مع ترتيب التاريخ أولاً ثم رقم القطار
+        // Multi-browser compatible file download (handles iOS Safari and Android Chrome sandbox blocks)
         function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet!");
@@ -366,15 +362,15 @@
             fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
             fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
             fileContent += "========================================\n\n";
-            fileContent += "Date       | Train No | Arrival  | Departure\n";
+            fileContent += "Train No | Date       | Arrival  | Departure\n";
             fileContent += "----------------------------------------\n";
 
             savedRecords.forEach(function(item) {
-                const dateFormatted = item.date.padEnd(10, ' ');
                 const trainFormatted = item.trainNumber.padEnd(8, ' ');
+                const dateFormatted = item.date.padEnd(10, ' ');
                 const arrFormatted = item.arrival.padEnd(8, ' ');
                 const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += dateFormatted + " | " + trainFormatted + " | " + arrFormatted + " | " + depFormatted + "\n";
+                fileContent += trainFormatted + " | " + dateFormatted + " | " + arrFormatted + " | " + depFormatted + "\n";
             });
 
             fileContent += "\n========================================\n";
@@ -382,6 +378,7 @@
             try {
                 const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
                 
+                // Fallback for Internet Explorer
                 if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                     window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
                     return;
@@ -393,11 +390,12 @@
                 
                 link.href = url;
                 link.download = fileName;
-                link.target = "_blank";
+                link.target = "_blank"; // Crucial parameter to force open download dialog in iOS Safari & Chrome WebViews
                 
                 document.body.appendChild(link);
                 link.click();
                 
+                // Keep the link for a split second before removing to ensure trigger succeeds
                 setTimeout(function() {
                     document.body.removeChild(link);
                     URL.revokeObjectURL(url);
@@ -413,4 +411,10 @@
                 }, 500);
 
             } catch (err) {
-                cons
+                console.error(err);
+                alert("❌ Download block encountered. Copying report instead:\n\n" + fileContent);
+            }
+        }
+    </script>
+</body>
+</html>
