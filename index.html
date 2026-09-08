@@ -461,4 +461,50 @@
             if (navigator.canShare && navigator.share) {
                 try {
                     const file = new File([blob], fileName, { 
-                        type: "application/vnd.openxmlformats-officedocumen
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+                    });
+
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: "Regularity Excel Report",
+                            text: "Regularity Measurement Report for " + formattedDate
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            // 2. التنزيل المباشر كملف .xlsx للمتصفح
+            try {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                promptReset();
+            } catch (err) {
+                console.error("Download error:", err);
+                alert("Download failed. Please check browser permissions.");
+            }
+        }
+
+        function promptReset() {
+            setTimeout(function() {
+                if (confirm("✅ Excel report exported successfully!\n\nDo you want to clear the saved list to start a new shift?")) {
+                    savedRecords = [];
+                    localStorage.removeItem('train_records');
+                    updateCounter();
+                    resetCurrentForm();
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
