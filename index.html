@@ -29,7 +29,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 20px 24px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -43,49 +43,44 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-top: 5px;
+            gap: 2px;
+            margin-top: 2px;
             width: 100%;
         }
 
         .header-title {
-            font-size: 24px;
+            font-size: 23px;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
         }
 
         .date-display {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
             background: rgba(0, 0, 0, 0.2);
-            padding: 4px 14px;
+            padding: 3px 12px;
             border-radius: 20px;
+            margin-top: 2px;
         }
 
         .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 6px; /* تم تقليل المسافة لأقصى حد لتقريب القائمة من العنوان */
             flex-grow: 1;
             justify-content: center;
-            gap: 12px;
+            gap: 11px;
             width: 100%;
-        }
-
-        .section-title {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 0 0 2px 0;
         }
 
         /* Dropdown selector styling */
         .select-field {
             width: 100%;
-            padding: 13px;
-            font-size: 17px;
+            padding: 12px;
+            font-size: 16px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align-last: center;
@@ -101,8 +96,8 @@
         /* Input fields */
         .input-field {
             width: 100%;
-            padding: 13px;
-            font-size: 26px;
+            padding: 12px;
+            font-size: 24px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -129,8 +124,8 @@
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 15px 0;
-            font-size: 19px;
+            padding: 14px 0;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -207,7 +202,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .status-msg {
@@ -322,7 +317,7 @@
         <div class="content">
             <!-- Inspectors Dropdown Menu -->
             <select id="userSelect" class="select-field">
-                <option value="" disabled selected>Select User / Inspector Name</option>
+                <option value="" disabled selected>👤 Select User / Inspector Name</option>
                 <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
                 <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
                 <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
@@ -347,7 +342,7 @@
                 placeholder="Enter Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*"
+                pattern="[0-9]*" 
                 autocomplete="off"
             />
 
@@ -627,14 +622,4 @@
 
         function promptReset() {
             setTimeout(function() {
-                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start a new shift?")) {
-                    savedRecords = [];
-                    localStorage.removeItem('train_records');
-                    updateCounter();
-                    resetCurrentForm();
-                }
-            }, 500);
-        }
-    </script>
-</body>
-</html>
+                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start fresh?")
