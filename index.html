@@ -11,7 +11,6 @@
             --btn-bg: #ffffff;
             --btn-text: #004d66;
         }
-
         body {
             margin: 0;
             padding: 0;
@@ -24,7 +23,6 @@
             align-items: center;
             min-height: 100vh;
         }
-
         .container {
             width: 100%;
             max-width: 412px;
@@ -37,7 +35,6 @@
             position: relative;
             background-color: var(--bg-color);
         }
-
         .header {
             display: flex;
             flex-direction: column;
@@ -47,14 +44,12 @@
             margin-top: 5px;
             width: 100%;
         }
-
         .header-title {
             font-size: 24px;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
         }
-
         .date-display {
             font-size: 15px;
             font-weight: 600;
@@ -63,7 +58,6 @@
             padding: 4px 14px;
             border-radius: 20px;
         }
-
         .content {
             display: flex;
             flex-direction: column;
@@ -74,12 +68,10 @@
             gap: 12px;
             width: 100%;
         }
-
-        /* قائمة اختيار اسم المستخدم */
         .select-field {
             width: 100%;
             padding: 13px;
-            font-size: 17px;
+            font-size: 16px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -91,8 +83,6 @@
             outline: none;
             transition: all 0.2s ease;
         }
-
-        /* حقل رقم القطار */
         .input-field {
             width: 100%;
             padding: 12px;
@@ -108,23 +98,20 @@
             outline: none;
             transition: all 0.2s ease;
         }
-
         .input-field::placeholder {
             color: #8c9ba5;
             font-size: 15px;
             letter-spacing: normal;
             font-weight: normal;
         }
-
-        /* أزرار التسجيل */
         .btn {
             width: 90%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 15px 0;
-            font-size: 19px;
+            padding: 14px 0;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -132,59 +119,31 @@
             text-align: center;
             display: block;
         }
-
         .btn:active {
             transform: scale(0.97);
             background-color: #e0f2f1;
         }
-
         .btn.recorded {
             background-color: #e8f5e9;
             color: #1b5e20;
             border: 2px solid #81c784;
         }
-
-        /* تحديد الحقل غير المكتمل */
         .error-highlight {
             border: 2px solid #ff5252 !important;
             background-color: #ffebee !important;
             color: #c62828 !important;
             animation: shake 0.3s ease-in-out;
         }
-
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-6px); }
             75% { transform: translateX(6px); }
         }
-
-        .btn-submit {
-            background-color: #2e7d32;
-            color: #ffffff;
-            margin-top: 3px;
-        }
-
-        .btn-submit:active {
-            background-color: #1b5e20;
-        }
-
-        .btn-export {
-            background-color: #f57c00;
-            color: #ffffff;
-        }
-
-        .btn-export:active {
-            background-color: #e65100;
-        }
-
-        .btn-clear {
-            background-color: #c62828;
-            color: #ffffff;
-            font-size: 14px;
-            padding: 8px 0;
-            width: 50%;
-        }
-
+        .btn-submit { background-color: #2e7d32; color: #ffffff; margin-top: 3px; }
+        .btn-submit:active { background-color: #1b5e20; }
+        .btn-export { background-color: #1d6f42; color: #ffffff; } /* Excel Green */
+        .btn-export:active { background-color: #144d2e; }
+        .btn-clear { background-color: #c62828; color: #ffffff; font-size: 14px; padding: 8px 0; width: 50%; }
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
             padding: 4px 12px;
@@ -194,7 +153,6 @@
             color: #ffd54f;
             margin-bottom: 2px;
         }
-
         .footer {
             display: flex;
             justify-content: space-between;
@@ -203,7 +161,6 @@
             color: rgba(255, 255, 255, 0.85);
             margin-top: 10px;
         }
-
         .status-msg {
             font-size: 13px;
             color: #ffd54f;
@@ -211,8 +168,6 @@
             min-height: 18px;
             text-align: left;
         }
-
-        /* إشعار الحفظ السريع المنبثق (Toast) */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -233,20 +188,11 @@
             z-index: 1000;
             pointer-events: none;
         }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* نافذة احتياطية لنسخ النص في حال منع المتصفح للتنزيل */
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .modal-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.7);
             z-index: 999;
             justify-content: center;
@@ -254,7 +200,6 @@
             padding: 20px;
             box-sizing: border-box;
         }
-
         .modal-card {
             background: #ffffff;
             color: #333333;
@@ -267,7 +212,6 @@
             flex-direction: column;
             gap: 12px;
         }
-
         .modal-card textarea {
             width: 100%;
             height: 180px;
@@ -279,7 +223,6 @@
             box-sizing: border-box;
             resize: none;
         }
-
         .modal-btn {
             padding: 12px;
             border: none;
@@ -288,20 +231,11 @@
             font-size: 16px;
             cursor: pointer;
         }
-
-        .modal-btn.copy {
-            background-color: #005a79;
-            color: #ffffff;
-        }
-
-        .modal-btn.close {
-            background-color: #e0e0e0;
-            color: #333;
-        }
+        .modal-btn.copy { background-color: #1d6f42; color: #ffffff; }
+        .modal-btn.close { background-color: #e0e0e0; color: #333; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -311,7 +245,6 @@
 
         <!-- Main Content -->
         <div class="content">
-            <!-- قائمة اختيار المفتش / المستخدم من الأسماء المحددة -->
             <select id="userSelect" class="select-field">
                 <option value="" disabled selected>👤 Select User / Inspector Name</option>
                 <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
@@ -330,7 +263,6 @@
                 <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
             </select>
 
-            <!-- حقل رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
@@ -344,36 +276,34 @@
 
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- أزرار التسجيل -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToExcel()">📊 Download / Share (Excel CSV)</button>
             <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 81</div>
+            <div>Ver 82</div>
         </div>
     </div>
 
-    <!-- عنصر الإشعار السريع (Toast Notification) -->
+    <!-- Toast Notification -->
     <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
-    <!-- نافذة منبثقة احتياطية للنسخ المباشر -->
+    <!-- Fallback Modal -->
     <div class="modal-overlay" id="reportModal">
         <div class="modal-card">
-            <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
+            <h3 style="margin:0; text-align:center; color:#1d6f42;">📊 Excel CSV Ready</h3>
             <textarea id="reportTextArea" readonly></textarea>
-            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy All Text</button>
+            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy CSV Data</button>
             <button class="modal-btn close" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
-        // ضبط تاريخ اليوم
         const today = new Date();
         const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
@@ -382,7 +312,6 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // استرجاع السجلات السابقة من ذاكرة الهاتف
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -394,7 +323,6 @@
         const arrivalBtn = document.getElementById('btnArrival');
         const departureBtn = document.getElementById('btnDeparture');
 
-        // استرجاع آخر اسم مستخدم تم اختياره تلقائياً
         const savedUser = localStorage.getItem('selected_user') || '';
         if (savedUser) {
             userSelect.value = savedUser;
@@ -408,10 +336,8 @@
         function updateCounter() {
             document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
         }
-
         updateCounter();
 
-        // إدخال أرقام فقط لرقم القطار
         trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
@@ -423,16 +349,14 @@
             }
         });
 
-        // دالة التوقيت 24 ساعة (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const s = String(now.getSeconds()).padStart(2, '0');
-            return h + ':' + m + ':' + s;
+            return `${h}:${m}:${s}`;
         }
 
-        // تسجيل وقت الوصول
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -441,7 +365,6 @@
             document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
-        // تسجيل وقت المغادرة
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -450,7 +373,6 @@
             document.getElementById('statusMessage').innerText = `Departure logged at ${departureTime}. Tap 'Save Train' to save.`;
         }
 
-        // إظهار إشعار الحفظ السريع
         function showToast(text) {
             const toast = document.getElementById('toastMessage');
             toast.innerText = text;
@@ -460,7 +382,6 @@
             }, 2000);
         }
 
-        // مسح الحقول للقطار التالي
         function resetCurrentForm() {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -469,19 +390,15 @@
             
             arrivalBtn.innerText = "Train Arrival";
             arrivalBtn.classList.remove('recorded', 'error-highlight');
-
             departureBtn.innerText = "Train Departure";
             departureBtn.classList.remove('recorded', 'error-highlight');
-
             document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
         }
 
-        // حفظ القطار مع التحقق من جميع الحقول
         function saveRecord() {
             const user = userSelect.value;
             const trainNo = trainInput.value.trim();
 
-            // 1. التحقق من اختيار اسم المستخدم
             if (!user) {
                 userSelect.classList.add('error-highlight');
                 userSelect.focus();
@@ -490,7 +407,6 @@
                 return;
             }
 
-            // 2. التحقق من رقم القطار (4 أرقام)
             if (!trainNo || trainNo.length < 4) {
                 trainInput.classList.add('error-highlight');
                 trainInput.focus();
@@ -499,7 +415,6 @@
                 return;
             }
 
-            // 3. التحقق من وقت الوصول
             if (!arrivalTime) {
                 arrivalBtn.classList.add('error-highlight');
                 alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
@@ -507,7 +422,6 @@
                 return;
             }
 
-            // 4. التحقق من وقت المغادرة
             if (!departureTime) {
                 departureBtn.classList.add('error-highlight');
                 alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
@@ -515,7 +429,6 @@
                 return;
             }
 
-            // حفظ السجل
             const newRecord = {
                 date: formattedDate,
                 user: user,
@@ -531,53 +444,45 @@
             } catch(e) {}
             
             updateCounter();
-            
-            // إظهار إشعار الحفظ السريع
             showToast(`✅ Train ${trainNo} Saved! (${savedRecords.length})`);
             resetCurrentForm();
         }
 
-        // إنشاء محتوى التقرير النصي بالترتيب: التاريخ -> الاسم -> رقم القطار -> الوصول -> المغادرة
-        function buildReportText() {
-            let txt = "========================================================================================\n";
-            txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
-            txt += "                              Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
-            txt += "========================================================================================\n\n";
-            txt += "Date       | Inspector / User                        | Train No | Arrival  | Departure\n";
-            txt += "----------------------------------------------------------------------------------------\n";
+        // إنشاء محتوى ملف CSV متوافق بالكامل مع Excel
+        function buildCsvContent() {
+            const headers = ["Date", "Inspector / User", "Train Number", "Arrival Time", "Departure Time", "Logged At"];
+            const rows = savedRecords.map(item => [
+                `"${item.date}"`,
+                `"${item.user.replace(/"/g, '""')}"`,
+                `"${item.trainNumber}"`,
+                `"${item.arrival}"`,
+                `"${item.departure}"`,
+                `"${item.timestamp}"`
+            ]);
 
-            savedRecords.forEach(function(item) {
-                const d = item.date.padEnd(10, ' ');
-                const u = item.user.padEnd(39, ' ');
-                const t = item.trainNumber.padEnd(8, ' ');
-                const a = item.arrival.padEnd(8, ' ');
-                const dep = item.departure.padEnd(8, ' ');
-                txt += d + " | " + u + " | " + t + " | " + a + " | " + dep + "\n";
-            });
-
-            txt += "\n========================================================================================\n";
-            return txt;
+            return [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
         }
 
-        // تصدير وتنزيل الملف
-        async function exportAllToTxt() {
+        // تصدير وتنزيل ملف Excel CSV
+        async function exportAllToExcel() {
             if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet! Please save at least one train.");
+                alert("⚠️ No saved trains to export yet! Please save at least one train.");
                 return;
             }
 
-            const reportText = buildReportText();
-            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
+            // إضافة UTF-8 BOM لضمان فتح الحروف بشكل سليم في Excel
+            const csvData = "\uFEFF" + buildCsvContent();
+            const fileName = `Regularity_${formattedDate.replace(/\//g, '-')}_Report.csv`;
 
-            // 1. المشاركة عبر نافذة الهاتف (Share Sheet)
+            // 1. مشاركة عبر Share Sheet الموبايل (WhatsApp / Outlook / Drive)
             if (navigator.canShare && navigator.share) {
                 try {
-                    const file = new File([reportText], fileName, { type: "text/plain" });
+                    const file = new File([csvData], fileName, { type: "text/csv;charset=utf-8;" });
                     if (navigator.canShare({ files: [file] })) {
                         await navigator.share({
                             files: [file],
-                            title: "Regularity Report",
-                            text: "Regularity Report for " + formattedDate
+                            title: "Regularity Excel Report",
+                            text: `Regularity Report for ${formattedDate}`
                         });
                         promptReset();
                         return;
@@ -587,24 +492,26 @@
                 }
             }
 
-            // 2. تنزيل مباشر عبر Data URI
+            // 2. تنزيل مباشر في المتصفح بصيغة CSV
             try {
-                const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
+                const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
                 const link = document.createElement("a");
-                link.setAttribute("href", encodedData);
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
                 link.setAttribute("download", fileName);
                 link.style.display = "none";
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                URL.revokeObjectURL(url);
                 promptReset();
                 return;
             } catch (err) {
-                console.error("Download error:", err);
+                console.error("Export error:", err);
             }
 
-            // 3. النافذة الاحتياطية للنسخ الفوري
-            document.getElementById('reportTextArea').value = reportText;
+            // 3. نافذة احتياطية لنسخ البيانات
+            document.getElementById('reportTextArea').value = buildCsvContent();
             document.getElementById('reportModal').style.display = 'flex';
         }
 
@@ -613,7 +520,7 @@
             ta.select();
             ta.setSelectionRange(0, 99999);
             document.execCommand('copy');
-            alert("📋 Report text copied to clipboard successfully!");
+            alert("📋 CSV text copied to clipboard successfully!");
         }
 
         function closeModal() {
@@ -623,7 +530,7 @@
 
         function promptReset() {
             setTimeout(function() {
-                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start a new shift?")) {
+                if (confirm("✅ Excel file exported!\n\nDo you want to clear the saved list to start a new shift?")) {
                     savedRecords = [];
                     localStorage.removeItem('train_records');
                     updateCounter();
