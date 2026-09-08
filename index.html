@@ -313,7 +313,7 @@
         <!-- Header -->
         <div class="header">
             <div class="header-title">Regularity Measurement</div>
-            <div class="date-display" id="currentDate"></div>
+            <div class="date-display" id="currentDate">--/--/----</div>
         </div>
 
         <!-- Main Content -->
@@ -352,17 +352,17 @@
             <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
             <!-- أزرار التسجيل والتحكم -->
-            <button class="btn" id="btnArrival" type="button">Train Arrival</button>
-            <button class="btn" id="btnDeparture" type="button">Train Departure</button>
-            <button class="btn btn-submit" id="btnSubmit" type="button">💾 Save Train</button>
-            <button class="btn btn-export" id="btnExport" type="button">📥 Download All (TXT File)</button>
-            <button class="btn btn-clear" id="btnClear" type="button">Clear Form</button>
+            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 83</div>
+            <div>Ver 84</div>
         </div>
     </div>
 
@@ -374,85 +374,270 @@
         <div class="modal-card">
             <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
             <textarea id="reportTextArea" readonly></textarea>
-            <button class="modal-btn copy" id="btnModalCopy" type="button">📋 Copy All Text</button>
-            <button class="modal-btn close" id="btnModalClose" type="button">Close</button>
+            <button class="modal-btn copy" id="btnModalCopy" type="button" onclick="copyReportText()">📋 Copy All Text</button>
+            <button class="modal-btn close" id="btnModalClose" type="button" onclick="closeModal()">Close</button>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // ضبط التاريخ
-            const today = new Date();
-            const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
-            document.getElementById('currentDate').innerText = formattedDate;
+        // إعداد التاريخ العام
+        const nowObj = new Date();
+        const formattedDate = (nowObj.getMonth() + 1) + '/' + nowObj.getDate() + '/' + nowObj.getFullYear();
+        document.getElementById('currentDate').innerText = formattedDate;
 
-            let arrivalTime = "";
-            let departureTime = "";
-            let savedRecords = [];
+        let arrivalTime = "";
+        let departureTime = "";
+        let savedRecords = [];
 
-            // استرجاع السجلات من ذاكرة الهاتف
+        // استرجاع السجلات السابقة
+        try {
+            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        } catch(e) {
+            savedRecords = [];
+        }
+
+        const userSelect = document.getElementById('userSelect');
+        const trainInput = document.getElementById('trainNumber');
+        const arrivalBtn = document.getElementById('btnArrival');
+        const departureBtn = document.getElementById('btnDeparture');
+        const statusMsg = document.getElementById('statusMessage');
+        const trainCounter = document.getElementById('trainCounter');
+        const toastMessage = document.getElementById('toastMessage');
+        const reportModal = document.getElementById('reportModal');
+        const reportTextArea = document.getElementById('reportTextArea');
+
+        // استرجاع آخر اسم مستخدم تم اختياره
+        const savedUser = localStorage.getItem('selected_user') || '';
+        if (savedUser) {
+            userSelect.value = savedUser;
+        }
+
+        userSelect.addEventListener('change', function() {
+            this.classList.remove('error-highlight');
+            localStorage.setItem('selected_user', this.value);
+        });
+
+        function updateCounter() {
+            trainCounter.innerText = "Saved Trains: " + savedRecords.length;
+        }
+        updateCounter();
+
+        // إدخال أرقام فقط لرقم القطار
+        trainInput.addEventListener('input', function() {
+            this.classList.remove('error-highlight');
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+            const val = this.value.trim();
+            if (val.length > 0) {
+                statusMsg.innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
+            } else {
+                statusMsg.innerText = "Enter Train Number & Tap Buttons...";
+            }
+        });
+
+        // دالة التوقيت بصيغة 24 ساعة (HH:MM:SS)
+        function get24HourTime() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return h + ':' + m + ':' + s;
+        }
+
+        // 1. تسجيل وقت الوصول
+        window.handleArrival = function() {
+            arrivalTime = get24HourTime();
+            arrivalBtn.innerText = "Arrival: " + arrivalTime;
+            arrivalBtn.classList.remove('error-highlight');
+            arrivalBtn.classList.add('recorded');
+            statusMsg.innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
+        };
+
+        // 2. تسجيل وقت المغادرة
+        window.handleDeparture = function() {
+            departureTime = get24HourTime();
+            departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.remove('error-highlight');
+            departureBtn.classList.add('recorded');
+            statusMsg.innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
+        };
+
+        // إظهار إشعار الحفظ السريع
+        function showToast(text) {
+            toastMessage.innerText = text;
+            toastMessage.classList.add('show');
+            setTimeout(function() {
+                toastMessage.classList.remove('show');
+            }, 2000);
+        }
+
+        // مسح الحقول للقطار التالي
+        window.resetCurrentForm = function() {
+            trainInput.value = "";
+            trainInput.classList.remove('error-highlight');
+            arrivalTime = "";
+            departureTime = "";
+            
+            arrivalBtn.innerText = "Train Arrival";
+            arrivalBtn.classList.remove('recorded', 'error-highlight');
+
+            departureBtn.innerText = "Train Departure";
+            departureBtn.classList.remove('recorded', 'error-highlight');
+
+            statusMsg.innerText = "Enter Train Number & Tap Buttons...";
+        };
+
+        // 3. حفظ بيانات القطار
+        window.saveRecord = function() {
+            const user = userSelect.value;
+            const trainNo = trainInput.value.trim();
+
+            // التحقق من الاسم
+            if (!user) {
+                userSelect.classList.add('error-highlight');
+                userSelect.focus();
+                alert("⚠️ Please select User / Inspector Name first!");
+                statusMsg.innerText = "⚠️ User / Inspector is required!";
+                return;
+            }
+
+            // التحقق من رقم القطار (4 أرقام)
+            if (!trainNo || trainNo.length < 4) {
+                trainInput.classList.add('error-highlight');
+                trainInput.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number!");
+                statusMsg.innerText = "⚠️ Train Number must be 4 digits!";
+                return;
+            }
+
+            // التحقق من وقت الوصول
+            if (!arrivalTime) {
+                arrivalBtn.classList.add('error-highlight');
+                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+                statusMsg.innerText = "⚠️ Please record Train Arrival time!";
+                return;
+            }
+
+            // التحقق من وقت المغادرة
+            if (!departureTime) {
+                departureBtn.classList.add('error-highlight');
+                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+                statusMsg.innerText = "⚠️ Please record Train Departure time!";
+                return;
+            }
+
+            const newRecord = {
+                date: formattedDate,
+                user: user,
+                trainNumber: trainNo,
+                arrival: arrivalTime,
+                departure: departureTime,
+                timestamp: get24HourTime()
+            };
+
+            savedRecords.push(newRecord);
             try {
-                savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
-            } catch(e) {
-                savedRecords = [];
-            }
-
-            // العناصر
-            const userSelect = document.getElementById('userSelect');
-            const trainInput = document.getElementById('trainNumber');
-            const arrivalBtn = document.getElementById('btnArrival');
-            const departureBtn = document.getElementById('btnDeparture');
-            const submitBtn = document.getElementById('btnSubmit');
-            const exportBtn = document.getElementById('btnExport');
-            const clearBtn = document.getElementById('btnClear');
-            const statusMsg = document.getElementById('statusMessage');
-            const trainCounter = document.getElementById('trainCounter');
-            const toastMessage = document.getElementById('toastMessage');
-            const reportModal = document.getElementById('reportModal');
-            const reportTextArea = document.getElementById('reportTextArea');
-            const btnModalCopy = document.getElementById('btnModalCopy');
-            const btnModalClose = document.getElementById('btnModalClose');
-
-            // استرجاع اسم المفتش المحفوظ
-            const savedUser = localStorage.getItem('selected_user') || '';
-            if (savedUser) {
-                userSelect.value = savedUser;
-            }
-
-            userSelect.addEventListener('change', function() {
-                this.classList.remove('error-highlight');
-                localStorage.setItem('selected_user', this.value);
-            });
-
-            function updateCounter() {
-                trainCounter.innerText = "Saved Trains: " + savedRecords.length;
-            }
+                localStorage.setItem('train_records', JSON.stringify(savedRecords));
+            } catch(e) {}
+            
             updateCounter();
+            showToast("✅ Train " + trainNo + " Saved Successfully!");
+            resetCurrentForm();
+        };
 
-            // فحص إدخال رقم القطار
-            trainInput.addEventListener('input', function() {
-                this.classList.remove('error-highlight');
-                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
-                const val = this.value.trim();
-                if (val.length > 0) {
-                    statusMsg.innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
-                } else {
-                    statusMsg.innerText = "Enter Train Number & Tap Buttons...";
-                }
+        // بناء نص التقرير
+        function buildReportText() {
+            let txt = "========================================================================================\n";
+            txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
+            txt += "                              Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
+            txt += "========================================================================================\n\n";
+            txt += "Date       | Inspector / User                        | Train No | Arrival  | Departure\n";
+            txt += "----------------------------------------------------------------------------------------\n";
+
+            savedRecords.forEach(function(item) {
+                const d = item.date.padEnd(10, ' ');
+                const u = item.user.padEnd(39, ' ');
+                const t = item.trainNumber.padEnd(8, ' ');
+                const a = item.arrival.padEnd(8, ' ');
+                const dep = item.departure.padEnd(8, ' ');
+                txt += d + " | " + u + " | " + t + " | " + a + " | " + dep + "\n";
             });
 
-            // دالة التوقيت 24 ساعة
-            function get24HourTime() {
-                const now = new Date();
-                const h = String(now.getHours()).padStart(2, '0');
-                const m = String(now.getMinutes()).padStart(2, '0');
-                const s = String(now.getSeconds()).padStart(2, '0');
-                return h + ':' + m + ':' + s;
+            txt += "\n========================================================================================\n";
+            return txt;
+        }
+
+        function promptReset() {
+            setTimeout(function() {
+                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start a new shift?")) {
+                    savedRecords = [];
+                    localStorage.removeItem('train_records');
+                    updateCounter();
+                    resetCurrentForm();
+                }
+            }, 500);
+        }
+
+        // 4. تصدير وتنزيل ملف التكست
+        window.exportAllToTxt = async function() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to download yet! Please save at least one train.");
+                return;
             }
 
-            // 1. تسجيل وقت الوصول
-            arrivalBtn.addEventListener('click', function () {
-                arrivalTime = get24HourTime();
-                arrivalBtn.innerText = "Arrival: " + arrivalTime;
-                arrivalBtn.classList.remove('error-highlight');
-                arrivalBtn.classList.add
+            const reportText = buildReportText();
+            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
+
+            // محاولة 1: المشاركة المباشرة (Share Sheet)
+            if (navigator.canShare && navigator.share) {
+                try {
+                    const file = new File([reportText], fileName, { type: "text/plain" });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: "Regularity Report",
+                            text: "Regularity Report for " + formattedDate
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            // محاولة 2: تنزيل مباشر عبر Data URI
+            try {
+                const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedData);
+                link.setAttribute("download", fileName);
+                link.setAttribute("target", "_blank");
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                promptReset();
+                return;
+            } catch (err) {
+                console.error("Download error:", err);
+            }
+
+            // محاولة 3: فتح النافذة الاحتياطية لنسخ النص
+            reportTextArea.value = reportText;
+            reportModal.style.display = 'flex';
+        };
+
+        window.copyReportText = function() {
+            reportTextArea.select();
+            reportTextArea.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert("📋 Report text copied to clipboard successfully!");
+        };
+
+        window.closeModal = function() {
+            reportModal.style.display = 'none';
+            promptReset();
+        };
+    </script>
+</body>
+</html>
