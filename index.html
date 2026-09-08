@@ -45,38 +45,22 @@
             margin-top: 5px;
         }
 
-        .back-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .back-button svg {
-            width: 38px;
-            height: 38px;
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2;
-        }
-
         .header-title {
-            font-size: 21px;
+            font-size: 24px;
             font-weight: bold;
-            flex-grow: 1;
-            text-align: left;
-            margin-left: 12px;
+            text-align: center;
+            width: 100%;
+            letter-spacing: 0.5px;
         }
 
         .date-display {
-            position: absolute;
-            top: 65px;
-            right: 24px;
-            font-size: 17px;
-            font-weight: bold;
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin: 5px auto 0 auto;
         }
 
         .content {
@@ -211,6 +195,8 @@
             font-size: 13px;
             color: #ffd54f;
             font-weight: 500;
+            min-height: 18px;
+            text-align: left;
         }
     </style>
 </head>
@@ -219,15 +205,8 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <button class="back-button" onclick="history.back()">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
-                    <path d="M14 8l-4 4 4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
             <div class="header-title">Regularity Measurement</div>
         </div>
-
         <div class="date-display" id="currentDate"></div>
 
         <!-- Main Content -->
@@ -248,7 +227,7 @@
                 autocomplete="off"
             />
 
-            <!-- All buttons are fully visible and active with absolutely zero display hidden states -->
+            <!-- All buttons are fully visible and active -->
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
@@ -316,7 +295,7 @@
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
             arrivalBtn.classList.remove('error-highlight');
             arrivalBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
+            document.getElementById('statusMessage').innerText = `Arrival logged at ${arrivalTime}. Tap 'Train Departure' next.`;
         }
 
         function handleDeparture() {
@@ -395,6 +374,7 @@
                 return;
             }
 
+            // Clean, pure linebreaks for text reports
             let fileContent = "========================================\\n";
             fileContent += "      REGULARITY MEASUREMENT REPORT      \\n";
             fileContent += "      Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\\n";
@@ -412,8 +392,11 @@
 
             fileContent += "\\n========================================\\n";
 
+            // Unescape newline characters
+            const cleanContent = fileContent.replace(/\\\\n/g, '\\n');
+
             try {
-                const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
+                const blob = new Blob([cleanContent], { type: "text/plain;charset=utf-8" });
                 
                 if (window.navigator && window.navigator.msSaveOrOpenBlob) {
                     window.navigator.msSaveOrOpenBlob(blob, "Regularity_Report.txt");
@@ -447,7 +430,7 @@
 
             } catch (err) {
                 console.error(err);
-                alert("❌ Download block encountered. Copying report instead:\\n\\n" + fileContent);
+                alert("❌ Download block encountered. Copying report instead:\\n\\n" + cleanContent);
             }
         }
     </script>
