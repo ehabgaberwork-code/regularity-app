@@ -29,78 +29,76 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 20px 24px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             box-sizing: border-box;
             position: relative;
+            background-color: var(--bg-color);
         }
 
         .header {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 5px;
-        }
-
-        .back-button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-        }
-
-        .back-button svg {
-            width: 38px;
-            height: 38px;
-            fill: none;
-            stroke: #ffffff;
-            stroke-width: 2;
+            gap: 2px;
+            margin-top: 2px;
+            width: 100%;
         }
 
         .header-title {
-            font-size: 21px;
+            font-size: 23px;
             font-weight: bold;
-            flex-grow: 1;
-            text-align: left;
-            margin-left: 12px;
+            text-align: center;
+            letter-spacing: 0.5px;
         }
 
         .date-display {
-            position: absolute;
-            top: 65px;
-            right: 24px;
-            font-size: 17px;
-            font-weight: bold;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 3px 12px;
+            border-radius: 20px;
+            margin-top: 2px;
         }
 
         .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 35px;
+            margin-top: 6px;
             flex-grow: 1;
             justify-content: center;
-            gap: 12px;
+            gap: 11px;
             width: 100%;
         }
 
-        .section-title {
-            font-size: 30px;
+        /* قائمة اختيار اسم المستخدم */
+        .select-field {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid transparent;
+            border-radius: 6px;
+            text-align-last: center;
+            box-sizing: border-box;
+            background-color: #ffffff;
+            color: #004d66;
             font-weight: bold;
-            margin: 0 0 5px 0;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
         }
 
-        /* حقل إدخال رقم القطار - كيبورد أرقام فقط */
+        /* حقل رقم القطار */
         .input-field {
             width: 100%;
-            padding: 14px;
-            font-size: 26px;
-            border: none;
+            padding: 12px;
+            font-size: 24px;
+            border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
@@ -108,42 +106,34 @@
             color: #004d66;
             letter-spacing: 6px;
             font-weight: bold;
-            -moz-appearance: textfield;
-        }
-
-        .input-field::-webkit-outer-spin-button,
-        .input-field::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
+            outline: none;
+            transition: all 0.2s ease;
         }
 
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 16px;
+            font-size: 15px;
             letter-spacing: normal;
             font-weight: normal;
         }
 
-        .action-block {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-        }
-
+        /* الأزرار التفاعلية */
         .btn {
-            width: 85%;
+            width: 90%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
-            border: none;
+            border: 2px solid transparent;
             border-radius: 6px;
             padding: 14px 0;
-            font-size: 19px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
             transition: all 0.2s ease;
+            text-align: center;
+            display: block;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn:active {
@@ -151,40 +141,36 @@
             background-color: #e0f2f1;
         }
 
-        .time-badge {
-            width: 85%;
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px dashed rgba(255, 255, 255, 0.5);
-            border-radius: 4px;
-            padding: 6px 0;
-            text-align: center;
-            font-size: 15px;
-            font-weight: bold;
-            color: #ffffff;
-            min-height: 20px;
-            letter-spacing: 1px;
-            box-sizing: border-box;
+        .btn.recorded {
+            background-color: #e8f5e9;
+            color: #1b5e20;
+            border: 2px solid #81c784;
         }
 
-        .time-badge.active {
-            background: #ffffff;
-            color: #004d66;
-            border: 1px solid #ffffff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        /* تحديد الحقل غير المكتمل */
+        .error-highlight {
+            border: 2px solid #ff5252 !important;
+            background-color: #ffebee !important;
+            color: #c62828 !important;
+            animation: shake 0.3s ease-in-out;
         }
 
-        /* زر حفظ القطار محلياً */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-6px); }
+            75% { transform: translateX(6px); }
+        }
+
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .btn-submit:active {
             background-color: #1b5e20;
         }
 
-        /* زر تحميل وتصدير الملف النهائي */
         .btn-export {
             background-color: #f57c00;
             color: #ffffff;
@@ -197,20 +183,19 @@
         .btn-clear {
             background-color: #c62828;
             color: #ffffff;
-        }
-
-        .btn-clear:active {
-            background-color: #8e0000;
+            font-size: 14px;
+            padding: 8px 0;
+            width: 50%;
         }
 
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
             padding: 4px 12px;
             border-radius: 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             color: #ffd54f;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .footer {
@@ -219,13 +204,46 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 15px;
+            margin-top: 8px;
         }
 
         .status-msg {
             font-size: 13px;
             color: #ffd54f;
             font-weight: 500;
+            min-height: 18px;
+            text-align: left;
+        }
+
+        /* إشعار الحفظ السريع */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background-color: #1b5e20;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 1000;
+            pointer-events: none;
+            text-align: center;
+            width: 80%;
+            max-width: 320px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
         }
     </style>
 </head>
@@ -234,25 +252,32 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <button class="back-button" onclick="history.back()">
-                <svg viewBox="0 0 24 24">
-                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" fill="none"/>
-                    <path d="M14 8l-4 4 4 4" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </button>
             <div class="header-title">Regularity Measurement</div>
+            <div class="date-display" id="currentDate">--/--/----</div>
         </div>
-
-        <div class="date-display" id="currentDate"></div>
 
         <!-- Main Content -->
         <div class="content">
-            <h1 class="section-title">Train Number</h1>
-            
-            <!-- عداد القطارات المحفوظة -->
-            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+            <!-- قائمة الأسماء المنسدلة -->
+            <select id="userSelect" class="select-field">
+                <option value="" disabled selected>👤 Select User / Inspector Name</option>
+                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
+                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
+                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
+                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
+                <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
+                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
+                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
+                <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
+                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
+                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
+                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
+                <option value="Donia Samir Abdelrazek Ahmed">Donia Samir Abdelrazek Ahmed</option>
+                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
+            </select>
 
-            <!-- حقل إدخال رقم القطار: أرقام فقط وبحد أقصى 4 أرقام -->
+            <!-- حقل إدخال رقم القطار -->
             <input 
                 type="tel" 
                 id="trainNumber" 
@@ -260,189 +285,59 @@
                 placeholder="Enter Train Number" 
                 maxlength="4" 
                 inputmode="numeric" 
-                pattern="[0-9]*"
+                pattern="[0-9]*" 
                 autocomplete="off"
-                onkeypress="return isOnlyDigit(event)"
-                oninput="sanitizeInput(this)" 
             />
 
-            <!-- بلوك وقت الوصول -->
-            <div class="action-block">
-                <button class="btn" id="btnArrival" onclick="recordArrival()">Train Arrival</button>
-                <div class="time-badge" id="arrivalBadge">Arrival: --:--:--</div>
-            </div>
+            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- بلوك وقت المغادرة -->
-            <div class="action-block">
-                <button class="btn" id="btnDeparture" onclick="recordDeparture()">Train Departure</button>
-                <div class="time-badge" id="departureBadge">Departure: --:--:--</div>
-            </div>
-
-            <!-- زر حفظ بيانات القطار الحالي وتجهيز الشاشة للقطار التالي -->
-            <button class="btn btn-submit" id="btnSubmit" onclick="saveTrainRecord()">💾 Submit (Save Train)</button>
-            
-            <!-- زر تحميل وتصدير كل القطارات في ملف TXT واحد -->
-            <button class="btn btn-export" id="btnExport" onclick="exportAllToTxt()">📥 Download All (TXT File)</button>
-            
-            <!-- زر مسح الإدخال الحالي أو تصفير القائمة -->
-            <button class="btn btn-clear" onclick="resetCurrentForm()">Clear Current Form</button>
+            <!-- أزرار التسجيل والتحكم -->
+            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            <div class="status-msg" id="statusMessage">Ready to record...</div>
-            <div>Ver 79</div>
+            <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
+            <div>Ver 87</div>
         </div>
     </div>
 
+    <!-- إشعار الحفظ الأخضر -->
+    <div class="toast" id="toastMessage"></div>
+
     <script>
-        // إظهار تاريخ اليوم تلقائياً بصيغة M/D/YYYY
-        const today = new Date();
-        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+        // إعداد التاريخ
+        const nowObj = new Date();
+        const formattedDate = (nowObj.getMonth() + 1) + '/' + nowObj.getDate() + '/' + nowObj.getFullYear();
         document.getElementById('currentDate').innerText = formattedDate;
 
         let arrivalTime = "";
         let departureTime = "";
-        
-        // استرجاع السجلات المحفوظة مسبقاً من ذاكرة الهاتف
-        let savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
-        updateCounter();
+        let savedRecords = [];
 
-        // حساب التوقيت بنظام 24 ساعة بدقة (HH:MM:SS)
-        function get24HourTime() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            return `${hours}:${minutes}:${seconds}`;
+        // استرجاع السجلات السابقة من ذاكرة الهاتف
+        try {
+            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        } catch(e) {
+            savedRecords = [];
         }
 
-        // منع الضغط على أي زر غير رقمي
-        function isOnlyDigit(evt) {
-            const charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode < 48 || charCode > 57) {
-                return false;
-            }
-            return true;
+        const userSelect = document.getElementById('userSelect');
+        const trainInput = document.getElementById('trainNumber');
+        const arrivalBtn = document.getElementById('btnArrival');
+        const departureBtn = document.getElementById('btnDeparture');
+        const statusMsg = document.getElementById('statusMessage');
+        const trainCounter = document.getElementById('trainCounter');
+        const toastMessage = document.getElementById('toastMessage');
+
+        // استرجاع آخر اسم مستخدم تم اختياره
+        const savedUser = localStorage.getItem('selected_user') || '';
+        if (savedUser) {
+            userSelect.value = savedUser;
         }
 
-        // تنظيف الإدخال وحذف أي أحرف وقصر الطول على 4 أرقام
-        function sanitizeInput(input) {
-            input.value = input.value.replace(/[^0-9]/g, '').slice(0, 4);
-        }
-
-        // تسجيل وقت الوصول
-        function recordArrival() {
-            arrivalTime = get24HourTime();
-            const badge = document.getElementById('arrivalBadge');
-            badge.innerText = "Arrival: " + arrivalTime;
-            badge.classList.add('active');
-            document.getElementById('statusMessage').innerText = "Arrival recorded: " + arrivalTime;
-        }
-
-        // تسجيل وقت المغادرة
-        function recordDeparture() {
-            departureTime = get24HourTime();
-            const badge = document.getElementById('departureBadge');
-            badge.innerText = "Departure: " + departureTime;
-            badge.classList.add('active');
-            document.getElementById('statusMessage').innerText = "Departure recorded: " + departureTime;
-        }
-
-        // تحديث عداد القطارات المحفوظة
-        function updateCounter() {
-            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
-        }
-
-        // مسح الحقول الحالية للقطار دون حذف السجلات السابقة
-        function resetCurrentForm() {
-            document.getElementById('trainNumber').value = "";
-            arrivalTime = "";
-            departureTime = "";
-            
-            const arrBadge = document.getElementById('arrivalBadge');
-            arrBadge.innerText = "Arrival: --:--:--";
-            arrBadge.classList.remove('active');
-
-            const depBadge = document.getElementById('departureBadge');
-            depBadge.innerText = "Departure: --:--:--";
-            depBadge.classList.remove('active');
-
-            document.getElementById('statusMessage').innerText = "Ready for next train.";
-        }
-
-        // 1️⃣ حفظ بيانات القطار الحالي محلياً
-        function saveTrainRecord() {
-            const trainNo = document.getElementById('trainNumber').value.trim();
-
-            if (!trainNo) {
-                alert("⚠️ Please enter the Train Number first!");
-                return;
-            }
-            if (!arrivalTime && !departureTime) {
-                alert("⚠️ Please record Arrival or Departure time before submitting!");
-                return;
-            }
-
-            const newRecord = {
-                date: formattedDate,
-                trainNumber: trainNo,
-                arrival: arrivalTime || "N/A",
-                departure: departureTime || "N/A",
-                timestamp: get24HourTime()
-            };
-
-            savedRecords.push(newRecord);
-            localStorage.setItem('train_records', JSON.stringify(savedRecords));
-            
-            updateCounter();
-            alert(`✅ Train ${trainNo} saved locally! Total: ${savedRecords.length}`);
-            resetCurrentForm();
-        }
-
-        // 2️⃣ تصدير وتنزيل جميع القطارات في ملف TXT واحد على الموبايل
-        function exportAllToTxt() {
-            if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to download yet!");
-                return;
-            }
-
-            // تجهيز محتوى ملف الـ TXT بشكل منظم ومرتب
-            let fileContent = "========================================\n";
-            fileContent += "      REGULARITY MEASUREMENT REPORT      \n";
-            fileContent += `      Date: ${formattedDate} | Total Trains: ${savedRecords.length}\n`;
-            fileContent += "========================================\n\n";
-            fileContent += "Train No | Date       | Arrival  | Departure\n";
-            fileContent += "----------------------------------------\n";
-
-            savedRecords.forEach((item, index) => {
-                const trainFormatted = item.trainNumber.padEnd(8, ' ');
-                const dateFormatted = item.date.padEnd(10, ' ');
-                const arrFormatted = item.arrival.padEnd(8, ' ');
-                const depFormatted = item.departure.padEnd(8, ' ');
-                fileContent += `${trainFormatted} | ${dateFormatted} | ${arrFormatted} | ${depFormatted}\n`;
-            });
-
-            fileContent += "\n========================================\n";
-
-            // إنشاء ملف التكست وبدء التنزيل تلقائياً على الموبايل
-            const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
-            const link = document.createElement("a");
-            const fileName = `Regularity_${formattedDate.replace(/\//g, '-')}_AllTrains.txt`;
-            
-            link.href = URL.createObjectURL(blob);
-            link.download = fileName;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            if (confirm("✅ TXT file downloaded successfully!\n\nDo you want to clear the saved trains list to start a new shift?")) {
-                savedRecords = [];
-                localStorage.removeItem('train_records');
-                updateCounter();
-                resetCurrentForm();
-            }
-        }
-    </script>
-</body>
-</html>
+        userSelect.addEventListener('change', functio
