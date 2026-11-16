@@ -178,20 +178,20 @@
             background-color: #e65100;
         }
 
-        /* Group for clearing actions */
+        /* Clear action buttons container */
         .action-row {
             display: flex;
             width: 100%;
             gap: 10px;
             justify-content: center;
-            margin-top: 2px;
+            margin-top: 4px;
         }
 
         .btn-clear {
             background-color: #d32f2f;
             color: #ffffff;
             font-size: 14px;
-            padding: 10px 0;
+            padding: 11px 0;
             flex: 1;
         }
 
@@ -203,7 +203,7 @@
             background-color: #455a64;
             color: #ffffff;
             font-size: 13px;
-            padding: 10px 0;
+            padding: 11px 0;
             flex: 1;
         }
 
@@ -265,7 +265,7 @@
             opacity: 1;
         }
 
-        /* Fallback modal */
+        /* Modal overlay for fallback copying */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -337,7 +337,7 @@
 
         <!-- Main Content -->
         <div class="content">
-            <!-- Inspector / User Dropdown (Donia removed) -->
+            <!-- Inspector / User Dropdown -->
             <select id="userSelect" class="select-field">
                 <option value="" disabled selected>👤 Select User / Inspector Name</option>
                 <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
@@ -374,8 +374,8 @@
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
             <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
-            
-            <!-- Clear Actions Row -->
+
+            <!-- Clear Action Row -->
             <div class="action-row">
                 <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm(true)">🧹 Clear Form</button>
                 <button class="btn btn-clear-all" id="btnClearAll" type="button" onclick="clearAllRecords()">🗑️ Clear All Saved</button>
@@ -385,14 +385,14 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 83</div>
+            <div>Ver 84</div>
         </div>
     </div>
 
-    <!-- Quick Toast Notification -->
+    <!-- Toast Notification -->
     <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
-    <!-- Fallback Modal for Copying Report -->
+    <!-- Fallback Modal -->
     <div class="modal-overlay" id="reportModal">
         <div class="modal-card">
             <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
@@ -412,7 +412,7 @@
         let departureTime = "";
         let savedRecords = [];
 
-        // Retrieve existing records from browser storage
+        // Load records from local storage
         try {
             savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
         } catch(e) {
@@ -440,7 +440,7 @@
         }
         updateCounter();
 
-        // Allow numbers only for train number
+        // Numeric-only check for train number
         trainInput.addEventListener('input', function() {
             this.classList.remove('error-highlight');
             this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
@@ -452,7 +452,7 @@
             }
         });
 
-        // 24-hour time formatting (HH:MM:SS)
+        // 24-hour time format (HH:MM:SS)
         function get24HourTime() {
             const now = new Date();
             const h = String(now.getHours()).padStart(2, '0');
@@ -461,7 +461,7 @@
             return h + ':' + m + ':' + s;
         }
 
-        // Log arrival time
+        // Record arrival
         function handleArrival() {
             arrivalTime = get24HourTime();
             arrivalBtn.innerText = "Arrival: " + arrivalTime;
@@ -470,7 +470,7 @@
             document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
         }
 
-        // Log departure time
+        // Record departure
         function handleDeparture() {
             departureTime = get24HourTime();
             departureBtn.innerText = "Departure: " + departureTime;
@@ -479,7 +479,7 @@
             document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
         }
 
-        // Display brief toast confirmation
+        // Quick toast popup
         function showToast(text) {
             const toast = document.getElementById('toastMessage');
             toast.innerText = text;
@@ -489,9 +489,7 @@
             }, 2000);
         }
 
-        // Reset current inputs
-        // clearUser = true (when clicking Clear Form): empties inspector dropdown as well
-        // clearUser = false (after Save Train): keeps inspector name for convenience
+        // Reset input fields
         function resetCurrentForm(clearUser = false) {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -514,7 +512,7 @@
             }
         }
 
-        // Clear all saved train records (Reset Shift)
+        // Clear all saved records from storage
         function clearAllRecords() {
             if (savedRecords.length === 0) {
                 alert("ℹ️ There are no saved trains to clear.");
@@ -531,7 +529,7 @@
             }
         }
 
-        // Save entry with full validation
+        // Save train record
         function saveRecord() {
             const user = userSelect.value;
             const trainNo = trainInput.value.trim();
@@ -582,11 +580,10 @@
 
             updateCounter();
             showToast("✅ Train " + trainNo + " Saved! (" + savedRecords.length + ")");
-            // Keep inspector name for next train
             resetCurrentForm(false);
         }
 
-        // Generate formatted text report
+        // Build report text layout
         function buildReportText() {
             let txt = "========================================================================================\n";
             txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
@@ -606,7 +603,7 @@
             return txt;
         }
 
-        // Export data to TXT file or device share sheet
+        // Export data
         async function exportAllToTxt() {
             if (savedRecords.length === 0) {
                 alert("⚠️ No saved trains to download yet! Please save at least one train.");
