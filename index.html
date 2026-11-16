@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- Library for instant screenshot capture -->
+    <!-- HTML2Canvas Library for Mobile Screenshots -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -31,7 +31,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 16px 22px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -45,23 +45,23 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 6px;
             margin-top: 2px;
             width: 100%;
         }
 
         .header-title {
-            font-size: 24px;
+            font-size: 23px;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
         }
 
         .date-display {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
-            color: rgba(255, 255, 255, 0.9);
-            background: rgba(0, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            background: rgba(0, 0, 0, 0.25);
             padding: 3px 14px;
             border-radius: 20px;
         }
@@ -73,7 +73,7 @@
             margin-top: 10px;
             flex-grow: 1;
             justify-content: center;
-            gap: 11px;
+            gap: 10px;
             width: 100%;
         }
 
@@ -94,7 +94,7 @@
             transition: all 0.2s ease;
         }
 
-        /* Train number input with fixed prefix */
+        /* Train number input */
         .input-field {
             width: 100%;
             padding: 11px;
@@ -105,7 +105,7 @@
             box-sizing: border-box;
             background-color: #ffffff;
             color: #004d66;
-            letter-spacing: 6px;
+            letter-spacing: 4px;
             font-weight: bold;
             outline: none;
             transition: all 0.2s ease;
@@ -163,14 +163,14 @@
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 2px;
+            margin-top: 3px;
         }
 
         .btn-submit:active {
             background-color: #1b5e20;
         }
 
-        /* Distinctive Standout Download & Share Button */
+        /* Standout Download & Share Button (Excel) */
         .btn-download-share {
             background: linear-gradient(135deg, #ff9100 0%, #e65100 100%);
             color: #ffffff;
@@ -184,7 +184,6 @@
 
         .btn-download-share:active {
             background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
-            box-shadow: 0 2px 8px rgba(230, 81, 0, 0.35);
             transform: scale(0.98);
         }
 
@@ -223,7 +222,7 @@
 
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
-            padding: 3px 14px;
+            padding: 4px 14px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: bold;
@@ -237,7 +236,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 10px;
+            margin-top: 12px;
         }
 
         .status-msg {
@@ -278,7 +277,7 @@
 </head>
 <body>
 
-<div class="container" id="appCaptureContainer">
+<div class="container" id="appCaptureArea">
     <!-- Header -->
     <div class="header">
         <div class="header-title">Regularity Measurement</div>
@@ -305,13 +304,13 @@
             <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
         </select>
 
-        <!-- Train Number Input (Defaults to 70) -->
+        <!-- Train Number Input with default fixed 70 -->
         <input 
             type="tel" 
             id="trainNumber" 
             class="input-field" 
-            value="70" 
-            placeholder="70__" 
+            value="70"
+            placeholder="70.." 
             maxlength="4" 
             inputmode="numeric" 
             pattern="[0-9]*" 
@@ -325,7 +324,7 @@
         <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
         <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
 
-        <!-- Standout Download Button for Excel -->
+        <!-- Distinctive Standout Download & Share Button (Excel CSV) -->
         <button class="btn btn-download-share" id="btnExportCsv" type="button" onclick="exportAndShareExcel()">📥 Download / Share All (Excel)</button>
 
         <!-- Clear Actions Row -->
@@ -337,8 +336,8 @@
 
     <!-- Footer -->
     <div class="footer">
-        <div class="status-msg" id="statusMessage">Enter last 2 digits of train...</div>
-        <div>Ver 91</div>
+        <div class="status-msg" id="statusMessage">Enter 2 digits & tap buttons...</div>
+        <div>Ver 92</div>
     </div>
 </div>
 
@@ -383,14 +382,7 @@
     }
     updateCounter();
 
-    // Prevent deleting the initial '70' prefix via Backspace
-    trainInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Backspace' && this.selectionStart <= 2 && this.selectionEnd <= 2) {
-            e.preventDefault();
-        }
-    });
-
-    // Ensure cursor moves to the end of '70' upon focus
+    // Focus handler for trainInput: place cursor right after 70
     trainInput.addEventListener('focus', function() {
         if (!this.value.startsWith('70')) {
             this.value = '70';
@@ -399,26 +391,34 @@
         this.setSelectionRange(len, len);
     });
 
-    // Handle train number input: enforce '70' prefix and auto-complete after 2 typed digits
+    // Enforce permanent "70" prefix and accept only 2 more digits
+    trainInput.addEventListener('keydown', function(e) {
+        // Prevent deleting 70
+        if ((e.key === 'Backspace' || e.key === 'Delete') && this.selectionStart <= 2 && this.selectionEnd <= 2) {
+            e.preventDefault();
+        }
+    });
+
     trainInput.addEventListener('input', function() {
         this.classList.remove('error-highlight');
-        let val = this.value.replace(/[^0-9]/g, '');
+        let numbersOnly = this.value.replace(/[^0-9]/g, '');
 
-        // Maintain 70 prefix at all times
-        if (!val.startsWith('70')) {
-            val = '70' + val.replace(/^7?0?/, '');
+        if (!numbersOnly.startsWith('70')) {
+            // If user somehow stripped 70, keep the tail and prepend 70
+            const tail = numbersOnly.replace(/^7?0?/, '');
+            numbersOnly = '70' + tail;
         }
 
-        val = val.slice(0, 4);
-        this.value = val;
+        this.value = numbersOnly.slice(0, 4);
+        const val = this.value.trim();
 
         if (val.length === 4) {
-            // Auto close mobile keyboard and scroll arrival button into view
+            document.getElementById('statusMessage').innerText = "Train " + val + " ready. Tap 'Train Arrival'.";
+            // Dismiss keyboard and bring next button into clear view
             this.blur();
-            document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
             arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
-            document.getElementById('statusMessage').innerText = "Train " + val + "... Enter remaining digit.";
+            document.getElementById('statusMessage').innerText = "Enter remaining 2 digits...";
         }
     });
 
@@ -437,7 +437,7 @@
         arrivalBtn.innerText = "Arrival: " + arrivalTime;
         arrivalBtn.classList.remove('error-highlight');
         arrivalBtn.classList.add('recorded');
-        document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
+        document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure'.";
     }
 
     // Log departure time
@@ -446,7 +446,7 @@
         departureBtn.innerText = "Departure: " + departureTime;
         departureBtn.classList.remove('error-highlight');
         departureBtn.classList.add('recorded');
-        document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
+        document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train'.";
     }
 
     // Display brief toast confirmation
@@ -456,35 +456,10 @@
         toast.classList.add('show');
         setTimeout(function() {
             toast.classList.remove('show');
-        }, 2000);
+        }, 2200);
     }
 
-    // Direct screenshot capture and instant download to phone without share popups
-    function captureAndDirectDownload(trainNo) {
-        const captureArea = document.getElementById('appCaptureContainer');
-        if (typeof html2canvas === 'undefined') return;
-
-        html2canvas(captureArea, {
-            scale: 2,
-            backgroundColor: '#005a79',
-            useCORS: true
-        }).then(function(canvas) {
-            const imageURL = canvas.toDataURL('image/png');
-            const cleanDate = formattedDate.replace(/\//g, '-');
-            const fileName = "Train_" + trainNo + "_" + cleanDate + ".png";
-
-            const downloadLink = document.createElement('a');
-            downloadLink.href = imageURL;
-            downloadLink.download = fileName;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        }).catch(function(err) {
-            console.error("Screenshot error:", err);
-        });
-    }
-
-    // Reset current inputs while retaining the '70' prefix
+    // Reset current inputs
     function resetCurrentForm(clearUser = false) {
         trainInput.value = "70";
         trainInput.classList.remove('error-highlight');
@@ -503,7 +478,7 @@
             showToast("🧹 Form Cleared!");
             document.getElementById('statusMessage').innerText = "Form cleared. Select user & enter train...";
         } else {
-            document.getElementById('statusMessage').innerText = "Train saved! Enter last 2 digits for next train...";
+            document.getElementById('statusMessage').innerText = "Train saved! Enter next 2 digits...";
         }
     }
 
@@ -524,8 +499,43 @@
         }
     }
 
-    // Save entry with full validation & trigger direct screenshot download
-    function saveRecord() {
+    // Automatic silent screenshot capture & download with input-fix
+    async function captureAndDirectDownload(trainNo) {
+        try {
+            const captureArea = document.getElementById('appCaptureArea');
+            if (typeof html2canvas === 'function') {
+                const canvas = await html2canvas(captureArea, {
+                    scale: 2, // High resolution
+                    useCORS: true,
+                    backgroundColor: '#005a79',
+                    onclone: function(clonedDoc) {
+                        // Ensure input value is completely visible and centered in cloned snapshot
+                        const clonedInput = clonedDoc.getElementById('trainNumber');
+                        if (clonedInput) {
+                            clonedInput.setAttribute('value', trainNo);
+                            clonedInput.style.letterSpacing = '2px';
+                            clonedInput.style.textAlign = 'center';
+                        }
+                    }
+                });
+
+                // Generate image download
+                const image = canvas.toDataURL("image/png");
+                const downloadLink = document.createElement("a");
+                const cleanDate = formattedDate.replace(/\//g, '-');
+                downloadLink.download = `Train_${trainNo}_${cleanDate}_${Date.now()}.png`;
+                downloadLink.href = image;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            }
+        } catch (err) {
+            console.error("Screenshot error:", err);
+        }
+    }
+
+    // Save entry with full validation and instant screenshot
+    async function saveRecord() {
         const user = userSelect.value;
         const trainNo = trainInput.value.trim();
 
@@ -537,10 +547,10 @@
             return;
         }
 
-        if (!trainNo || trainNo.length < 4 || !trainNo.startsWith('70')) {
+        if (!trainNo || trainNo.length < 4) {
             trainInput.classList.add('error-highlight');
             trainInput.focus();
-            alert("⚠️ Please enter the complete 4-digit Train Number (70xx)!");
+            alert("⚠️ Please enter a complete 4-digit Train Number (70xx)!");
             document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
             return;
         }
@@ -568,26 +578,29 @@
             timestamp: get24HourTime()
         };
 
-        // Take direct screenshot download to device
-        captureAndDirectDownload(trainNo);
-
         savedRecords.push(newRecord);
         try {
             localStorage.setItem('train_records', JSON.stringify(savedRecords));
         } catch(e) {}
 
         updateCounter();
+
+        // 1. Take screenshot BEFORE resetting inputs so train number is 100% captured
+        await captureAndDirectDownload(trainNo);
+
+        // 2. Show toast notification & prepare form for next train
         showToast("✅ Train " + trainNo + " Saved & Captured!");
         resetCurrentForm(false);
     }
 
-    // Download & Share function for Microsoft Excel (.csv)
+    // Unified Download & Share function for Microsoft Excel (.csv)
     async function exportAndShareExcel() {
         if (savedRecords.length === 0) {
             alert("⚠️ No saved trains to export! Please save at least one train.");
             return;
         }
 
+        // UTF-8 BOM (\uFEFF) ensures Excel opens Arabic characters & headers accurately
         let csvContent = "\uFEFF";
         csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
 
@@ -607,6 +620,7 @@
         const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
+        // 1. Mobile & Web Share Sheet (WhatsApp, Mail, Save to Files, etc.)
         if (navigator.canShare && navigator.share) {
             try {
                 const file = new File([blob], fileName, { type: "text/csv" });
@@ -624,6 +638,7 @@
             }
         }
 
+        // 2. Direct Browser File Download (Desktop / fallback)
         try {
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
