@@ -10,8 +10,6 @@
             --text-color: #ffffff;
             --btn-bg: #ffffff;
             --btn-text: #004d66;
-            --excel-green: #107c41;
-            --excel-green-active: #0b5a2f;
         }
 
         body {
@@ -170,17 +168,22 @@
             background-color: #1b5e20;
         }
 
-        /* Combined Single Download & Share Button (Excel CSV) */
+        /* Distinctive Standout Download & Share Button */
         .btn-download-share {
-            background-color: var(--excel-green);
+            background: linear-gradient(135deg, #ff9100 0%, #e65100 100%);
             color: #ffffff;
             font-size: 18px;
             padding: 15px 0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 4px 15px rgba(230, 81, 0, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+            letter-spacing: 0.3px;
         }
 
         .btn-download-share:active {
-            background-color: var(--excel-green-active);
+            background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+            box-shadow: 0 2px 8px rgba(230, 81, 0, 0.35);
+            transform: scale(0.98);
         }
 
         /* Action buttons row */
@@ -319,7 +322,7 @@
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
 
-            <!-- Single Unified Download & Share Button (Excel CSV) -->
+            <!-- Distinctive Single Download & Share Button (Excel CSV) -->
             <button class="btn btn-download-share" id="btnExportCsv" type="button" onclick="exportAndShareExcel()">📥 Download / Share All (Excel)</button>
 
             <!-- Clear Actions Row -->
@@ -332,7 +335,7 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 87</div>
+            <div>Ver 88</div>
         </div>
     </div>
 
