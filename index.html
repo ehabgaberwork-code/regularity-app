@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Regularity Measurement</title>
-    <!-- مكتبة التقاط صور الشاشة تلقائياً -->
+    <!-- Library for capturing screen directly -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
@@ -23,7 +23,7 @@
             color: var(--text-color);
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             min-height: 100vh;
         }
 
@@ -31,7 +31,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 12px 18px 20px 18px;
+            padding: 16px 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -61,9 +61,9 @@
             font-size: 14px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            background: rgba(0, 0, 0, 0.25);
+            background: rgba(0, 0, 0, 0.2);
             padding: 3px 14px;
-            border-radius: 18px;
+            border-radius: 20px;
         }
 
         .content {
@@ -72,7 +72,7 @@
             align-items: center;
             margin-top: 10px;
             flex-grow: 1;
-            justify-content: flex-start;
+            justify-content: center;
             gap: 10px;
             width: 100%;
         }
@@ -83,7 +83,7 @@
             padding: 12px;
             font-size: 16px;
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
@@ -97,10 +97,10 @@
         /* Train number input */
         .input-field {
             width: 100%;
-            padding: 10px;
-            font-size: 26px;
+            padding: 11px;
+            font-size: 24px;
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
@@ -113,7 +113,7 @@
 
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 15px;
+            font-size: 14px;
             letter-spacing: normal;
             font-weight: normal;
         }
@@ -124,9 +124,9 @@
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: 2px solid transparent;
-            border-radius: 8px;
+            border-radius: 6px;
             padding: 13px 0;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -175,7 +175,7 @@
             background: linear-gradient(135deg, #ff9100 0%, #e65100 100%);
             color: #ffffff;
             font-size: 17px;
-            padding: 13px 0;
+            padding: 14px 0;
             box-shadow: 0 4px 15px rgba(230, 81, 0, 0.45);
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
@@ -184,6 +184,7 @@
 
         .btn-download-share:active {
             background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
+            box-shadow: 0 2px 8px rgba(230, 81, 0, 0.35);
             transform: scale(0.98);
         }
 
@@ -200,33 +201,40 @@
             background-color: #d32f2f;
             color: #ffffff;
             font-size: 14px;
-            padding: 9px 0;
+            padding: 10px 0;
             flex: 1;
+        }
+
+        .btn-clear:active {
+            background-color: #b71c1c;
         }
 
         .btn-clear-all {
             background-color: #455a64;
             color: #ffffff;
             font-size: 13px;
-            padding: 9px 0;
+            padding: 10px 0;
             flex: 1;
+        }
+
+        .btn-clear-all:active {
+            background-color: #263238;
         }
 
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
-            padding: 4px 14px;
+            padding: 3px 14px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: bold;
             color: #ffd54f;
-            margin: 2px 0;
         }
 
         .footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 13px;
+            font-size: 12px;
             color: rgba(255, 255, 255, 0.85);
             margin-top: 10px;
         }
@@ -259,8 +267,6 @@
             transition: all 0.4s ease;
             z-index: 1000;
             pointer-events: none;
-            text-align: center;
-            max-width: 90%;
         }
 
         .toast.show {
@@ -330,7 +336,7 @@
     <!-- Footer -->
     <div class="footer">
         <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-        <div>Ver 89</div>
+        <div>Ver 90</div>
     </div>
 </div>
 
@@ -375,29 +381,22 @@
     }
     updateCounter();
 
-    // Focus handler: automatically scroll into view smoothly
-    trainInput.addEventListener('focus', function() {
-        setTimeout(function() {
-            arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 200);
-    });
-
-    // Auto-detect 4 digits, dismiss keyboard, and reveal next button
+    // Auto-focus next button & close keyboard upon typing 4 digits
     trainInput.addEventListener('input', function() {
         this.classList.remove('error-highlight');
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
         const val = this.value.trim();
 
         if (val.length === 4) {
-            document.getElementById('statusMessage').innerText = "Train " + val + " ready. Tap 'Train Arrival'.";
-            // Close mobile keyboard automatically
+            document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
+            // Hide phone keyboard immediately
             this.blur();
-            // Scroll smoothly to make the arrival button centered
+            // Scroll arrival button smoothly into center view
             setTimeout(function() {
                 arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 100);
+            }, 80);
         } else if (val.length > 0) {
-            document.getElementById('statusMessage').innerText = "Train " + val + " entered. (" + val.length + "/4)";
+            document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
         } else {
             document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
         }
@@ -419,7 +418,6 @@
         arrivalBtn.classList.remove('error-highlight');
         arrivalBtn.classList.add('recorded');
         document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
-        departureBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Log departure time
@@ -429,7 +427,6 @@
         departureBtn.classList.remove('error-highlight');
         departureBtn.classList.add('recorded');
         document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
-        document.getElementById('btnSubmit').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
 
     // Display brief toast confirmation
@@ -439,7 +436,7 @@
         toast.classList.add('show');
         setTimeout(function() {
             toast.classList.remove('show');
-        }, 2500);
+        }, 2200);
     }
 
     // Reset current inputs
@@ -482,56 +479,36 @@
         }
     }
 
-    // Take automatic screenshot of the app and save/share as PNG image
-    async function captureAndSaveScreenshot(trainNo) {
+    // Direct image download (Screenshot) without opening share sheet
+    async function captureAndDirectDownload(trainNo) {
         if (typeof html2canvas === 'undefined') return;
         try {
-            const container = document.getElementById('appContainer');
-            const canvas = await html2canvas(container, {
+            const appBox = document.getElementById('appContainer');
+            const canvas = await html2canvas(appBox, {
                 scale: 2,
                 useCORS: true,
-                backgroundColor: '#005a79'
+                backgroundColor: '#005a79',
+                logging: false
             });
 
-            const fileName = "Train_" + trainNo + "_" + formattedDate.replace(/\//g, '-') + "_" + arrivalTime.replace(/:/g, '') + ".png";
+            const imgData = canvas.toDataURL('image/png');
+            const cleanDate = formattedDate.replace(/\//g, '-');
+            const cleanTime = get24HourTime().replace(/:/g, '');
+            const fileName = `Train_${trainNo}_${cleanDate}_${cleanTime}.png`;
 
-            canvas.toBlob(async function(blob) {
-                if (!blob) return;
-
-                // 1. Mobile Share (Allows instant save to Photos gallery or send via WhatsApp)
-                if (navigator.canShare && window.File) {
-                    try {
-                        const file = new File([blob], fileName, { type: 'image/png' });
-                        if (navigator.canShare({ files: [file] })) {
-                            await navigator.share({
-                                files: [file],
-                                title: "Train " + trainNo + " Record",
-                                text: "Regularity Measurement screenshot for train " + trainNo
-                            });
-                            return;
-                        }
-                    } catch (e) {
-                        if (e.name === 'AbortError') return;
-                    }
-                }
-
-                // 2. Direct automatic image download to phone Downloads folder
-                const link = document.createElement('a');
-                link.download = fileName;
-                link.href = URL.createObjectURL(blob);
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                setTimeout(function() {
-                    URL.revokeObjectURL(link.href);
-                }, 1000);
-            }, 'image/png');
-        } catch (err) {
-            console.error("Screenshot error:", err);
+            // Trigger silent direct download directly to mobile storage
+            const dl = document.createElement('a');
+            dl.href = imgData;
+            dl.download = fileName;
+            document.body.appendChild(dl);
+            dl.click();
+            document.body.removeChild(dl);
+        } catch(err) {
+            console.error("Screenshot capture error:", err);
         }
     }
 
-    // Save entry with full validation and take instant screenshot
+    // Save entry with full validation and direct screenshot download
     async function saveRecord() {
         const user = userSelect.value;
         const trainNo = trainInput.value.trim();
@@ -581,15 +558,13 @@
         } catch(e) {}
 
         updateCounter();
-        showToast("📸 Train " + trainNo + " Saved & Photo Captured!");
+        showToast("💾 Train " + trainNo + " Saved & Photo Downloaded!");
 
-        // Take screenshot of the screen with all details filled
-        await captureAndSaveScreenshot(trainNo);
+        // 1. Capture screen with recorded times and save directly as image file
+        await captureAndDirectDownload(trainNo);
 
-        // Reset form for next train after brief moment to capture screenshot
-        setTimeout(function() {
-            resetCurrentForm(false);
-        }, 600);
+        // 2. Clear inputs for next entry while preserving user
+        resetCurrentForm(false);
     }
 
     // Unified Download & Share function for Microsoft Excel (.csv)
@@ -619,7 +594,7 @@
         const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-        // 1. Mobile & Web Share Sheet
+        // 1. Mobile & Web Share Sheet for Excel
         if (navigator.canShare && navigator.share) {
             try {
                 const file = new File([blob], fileName, { type: "text/csv" });
@@ -667,6 +642,5 @@
         }, 500);
     }
 </script>
-
 </body>
 </html>
