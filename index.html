@@ -94,11 +94,18 @@
             transition: all 0.2s ease;
         }
 
+        /* Train number box wrapper */
+        .train-box-wrapper {
+            width: 100%;
+            position: relative;
+        }
+
         /* Train number input */
         .input-field {
             width: 100%;
-            padding: 11px;
+            padding: 12px 10px;
             font-size: 26px;
+            line-height: 1.3;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -113,7 +120,7 @@
 
         .input-field::placeholder {
             color: #8c9ba5;
-            font-size: 15px;
+            font-size: 16px;
             letter-spacing: normal;
             font-weight: normal;
         }
@@ -304,18 +311,20 @@
             <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
         </select>
 
-        <!-- Train Number Input with default fixed 70 -->
-        <input 
-            type="tel" 
-            id="trainNumber" 
-            class="input-field" 
-            value="70"
-            placeholder="70.." 
-            maxlength="4" 
-            inputmode="numeric" 
-            pattern="[0-9]*" 
-            autocomplete="off"
-        />
+        <!-- Train Number Box -->
+        <div class="train-box-wrapper" id="trainBoxWrapper">
+            <input 
+                type="tel" 
+                id="trainNumber" 
+                class="input-field" 
+                value="70"
+                placeholder="70.." 
+                maxlength="4" 
+                inputmode="numeric" 
+                pattern="[0-9]*" 
+                autocomplete="off"
+            />
+        </div>
 
         <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
@@ -337,7 +346,7 @@
     <!-- Footer -->
     <div class="footer">
         <div class="status-msg" id="statusMessage">Enter 2 digits & tap buttons...</div>
-        <div>Ver 92</div>
+        <div>Ver 93</div>
     </div>
 </div>
 
@@ -393,7 +402,6 @@
 
     // Enforce permanent "70" prefix and accept only 2 more digits
     trainInput.addEventListener('keydown', function(e) {
-        // Prevent deleting 70
         if ((e.key === 'Backspace' || e.key === 'Delete') && this.selectionStart <= 2 && this.selectionEnd <= 2) {
             e.preventDefault();
         }
@@ -404,7 +412,6 @@
         let numbersOnly = this.value.replace(/[^0-9]/g, '');
 
         if (!numbersOnly.startsWith('70')) {
-            // If user somehow stripped 70, keep the tail and prepend 70
             const tail = numbersOnly.replace(/^7?0?/, '');
             numbersOnly = '70' + tail;
         }
@@ -414,7 +421,6 @@
 
         if (val.length === 4) {
             document.getElementById('statusMessage').innerText = "Train " + val + " ready. Tap 'Train Arrival'.";
-            // Dismiss keyboard and bring next button into clear view
             this.blur();
             arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
         } else {
@@ -499,22 +505,37 @@
         }
     }
 
-    // Automatic silent screenshot capture & download with input-fix
+    // Perfect mobile screenshot capture: replaces <input> with a perfectly rendered <div> in cloned DOM
     async function captureAndDirectDownload(trainNo) {
         try {
             const captureArea = document.getElementById('appCaptureArea');
             if (typeof html2canvas === 'function') {
                 const canvas = await html2canvas(captureArea, {
-                    scale: 2, // High resolution
+                    scale: 2,
                     useCORS: true,
                     backgroundColor: '#005a79',
                     onclone: function(clonedDoc) {
-                        // Ensure input value is completely visible and centered in cloned snapshot
-                        const clonedInput = clonedDoc.getElementById('trainNumber');
-                        if (clonedInput) {
-                            clonedInput.setAttribute('value', trainNo);
-                            clonedInput.style.letterSpacing = '2px';
-                            clonedInput.style.textAlign = 'center';
+                        const wrapper = clonedDoc.getElementById('trainBoxWrapper');
+                        if (wrapper) {
+                            // Replace <input> with a bulletproof styled <div> so no digit or edge ever gets cut
+                            wrapper.innerHTML = `
+                                <div style="
+                                    width: 100%;
+                                    box-sizing: border-box;
+                                    padding: 10px 0;
+                                    background: #ffffff;
+                                    color: #004d66;
+                                    font-size: 26px;
+                                    font-weight: bold;
+                                    letter-spacing: 5px;
+                                    text-align: center;
+                                    border-radius: 6px;
+                                    line-height: 1.2;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                ">${trainNo}</div>
+                            `;
                         }
                     }
                 });
@@ -600,7 +621,6 @@
             return;
         }
 
-        // UTF-8 BOM (\uFEFF) ensures Excel opens Arabic characters & headers accurately
         let csvContent = "\uFEFF";
         csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
 
@@ -620,7 +640,7 @@
         const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
 
-        // 1. Mobile & Web Share Sheet (WhatsApp, Mail, Save to Files, etc.)
+        // 1. Mobile Share Sheet
         if (navigator.canShare && navigator.share) {
             try {
                 const file = new File([blob], fileName, { type: "text/csv" });
@@ -638,7 +658,7 @@
             }
         }
 
-        // 2. Direct Browser File Download (Desktop / fallback)
+        // 2. Direct Browser File Download
         try {
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
