@@ -10,6 +10,8 @@
             --text-color: #ffffff;
             --btn-bg: #ffffff;
             --btn-text: #004d66;
+            --excel-green: #107c41;
+            --excel-green-active: #0b5a2f;
         }
 
         body {
@@ -166,6 +168,16 @@
 
         .btn-submit:active {
             background-color: #1b5e20;
+        }
+
+        /* Excel Export Button */
+        .btn-excel {
+            background-color: var(--excel-green);
+            color: #ffffff;
+        }
+
+        .btn-excel:active {
+            background-color: var(--excel-green-active);
         }
 
         .btn-export {
@@ -372,6 +384,11 @@
             <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+            
+            <!-- Excel CSV Export Button -->
+            <button class="btn btn-excel" id="btnExportCsv" type="button" onclick="exportAllToCsv()">📊 Export to Excel (CSV)</button>
+            
+            <!-- TXT Export Button -->
             <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
 
             <!-- Clear Actions Row -->
@@ -384,7 +401,7 @@
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 85</div>
+            <div>Ver 86</div>
         </div>
     </div>
 
@@ -489,8 +506,6 @@
         }
 
         // Reset current inputs
-        // clearUser = true (when clicking Clear Form): empties inspector dropdown as well
-        // clearUser = false (after Save Train): keeps inspector name for convenience
         function resetCurrentForm(clearUser = false) {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
@@ -581,8 +596,71 @@
 
             updateCounter();
             showToast("✅ Train " + trainNo + " Saved! (" + savedRecords.length + ")");
-            // Keep inspector name for next train
             resetCurrentForm(false);
+        }
+
+        // Export data to CSV for Microsoft Excel
+        async function exportAllToCsv() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to export! Please save at least one train.");
+                return;
+            }
+
+            // UTF-8 BOM (\uFEFF) ensures Excel opens Arabic characters & headers correctly
+            let csvContent = "\uFEFF";
+            csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
+
+            savedRecords.forEach(function(item) {
+                const userSafe = '"' + (item.user || '').replace(/"/g, '""') + '"';
+                const row = [
+                    `"${item.date}"`,
+                    userSafe,
+                    `"${item.trainNumber}"`,
+                    `"${item.arrival}"`,
+                    `"${item.departure}"`,
+                    `"${item.timestamp || ''}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+            // Support Mobile Share Sheet
+            if (navigator.canShare && navigator.share) {
+                try {
+                    const file = new File([blob], fileName, { type: "text/csv" });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: "Regularity CSV Export",
+                            text: "Regularity Data for " + formattedDate
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch(e) {
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            // Direct Browser Download
+            try {
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", fileName);
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showToast("📊 CSV Exported for Excel!");
+                promptReset();
+            } catch (err) {
+                console.error("CSV Download error:", err);
+                alert("Download failed. Please check browser permissions.");
+            }
         }
 
         // Generate formatted text report
