@@ -1,3 +1,4 @@
+```
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,7 +80,7 @@
         .select-field {
             width: 100%;
             padding: 13px;
-            font-size: 17px;
+            font-size: 16px;
             border: 2px solid transparent;
             border-radius: 6px;
             text-align: center;
@@ -118,13 +119,13 @@
 
         /* Action buttons */
         .btn {
-            width: 90%;
+            width: 100%;
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: 2px solid transparent;
             border-radius: 6px;
-            padding: 15px 0;
-            font-size: 19px;
+            padding: 14px 0;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
@@ -134,7 +135,7 @@
         }
 
         .btn:active {
-            transform: scale(0.97);
+            transform: scale(0.98);
             background-color: #e0f2f1;
         }
 
@@ -161,7 +162,7 @@
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 3px;
+            margin-top: 4px;
         }
 
         .btn-submit:active {
@@ -181,13 +182,13 @@
             background-color: #c62828;
             color: #ffffff;
             font-size: 14px;
-            padding: 8px 0;
-            width: 50%;
+            padding: 9px 0;
+            width: 60%;
         }
 
         .counter-badge {
             background: rgba(0, 0, 0, 0.25);
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 12px;
             font-size: 13px;
             font-weight: bold;
@@ -201,7 +202,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .status-msg {
@@ -212,7 +213,7 @@
             text-align: left;
         }
 
-        /* Toast Notification */
+        /* Toast notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -239,7 +240,7 @@
             opacity: 1;
         }
 
-        /* Fallback copy modal */
+        /* Fallback modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -301,6 +302,7 @@
     </style>
 </head>
 <body>
+
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -311,4 +313,311 @@
         <!-- Main Content -->
         <div class="content">
             <!-- Inspector / User Dropdown (Donia removed) -->
-            <select id
+            <select id="userSelect" class="select-field">
+                <option value="" disabled selected>👤 Select User / Inspector Name</option>
+                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
+                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
+                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
+                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
+                <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
+                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
+                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
+                <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
+                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
+                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
+                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
+                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
+                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
+            </select>
+
+            <!-- Train Number Input -->
+            <input 
+                type="tel" 
+                id="trainNumber" 
+                class="input-field" 
+                placeholder="🚆 Train Number (4 digits)" 
+                maxlength="4" 
+                inputmode="numeric" 
+                pattern="[0-9]*" 
+                autocomplete="off"
+            />
+
+            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+
+            <!-- Action Buttons -->
+            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+            <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
+            <div>Ver 82</div>
+        </div>
+    </div>
+
+    <!-- Quick Toast Notification -->
+    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
+
+    <!-- Fallback Modal for Copying Report -->
+    <div class="modal-overlay" id="reportModal">
+        <div class="modal-card">
+            <h3 style="margin:0; text-align:center; color:#005a79;">📄 TXT Report Ready</h3>
+            <textarea id="reportTextArea" readonly></textarea>
+            <button class="modal-btn copy" onclick="copyReportText()">📋 Copy All Text</button>
+            <button class="modal-btn close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date
+        const today = new Date();
+        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+        document.getElementById('currentDate').innerText = formattedDate;
+
+        let arrivalTime = "";
+        let departureTime = "";
+        let savedRecords = [];
+
+        // Retrieve existing records from browser storage
+        try {
+            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+        } catch(e) {
+            savedRecords = [];
+        }
+
+        const userSelect = document.getElementById('userSelect');
+        const trainInput = document.getElementById('trainNumber');
+        const arrivalBtn = document.getElementById('btnArrival');
+        const departureBtn = document.getElementById('btnDeparture');
+
+        // Restore previously selected user name
+        const savedUser = localStorage.getItem('selected_user') || '';
+        if (savedUser) {
+            userSelect.value = savedUser;
+        }
+
+        userSelect.addEventListener('change', function() {
+            this.classList.remove('error-highlight');
+            localStorage.setItem('selected_user', this.value);
+        });
+
+        function updateCounter() {
+            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+        }
+        updateCounter();
+
+        // Allow numbers only for train number
+        trainInput.addEventListener('input', function() {
+            this.classList.remove('error-highlight');
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+            const val = this.value.trim();
+            if (val.length > 0) {
+                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
+            } else {
+                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
+            }
+        });
+
+        // 24-hour time formatting (HH:MM:SS)
+        function get24HourTime() {
+            const now = new Date();
+            const h = String(now.getHours()).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const s = String(now.getSeconds()).padStart(2, '0');
+            return h + ':' + m + ':' + s;
+        }
+
+        // Log arrival time
+        function handleArrival() {
+            arrivalTime = get24HourTime();
+            arrivalBtn.innerText = "Arrival: " + arrivalTime;
+            arrivalBtn.classList.remove('error-highlight');
+            arrivalBtn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
+        }
+
+        // Log departure time
+        function handleDeparture() {
+            departureTime = get24HourTime();
+            departureBtn.innerText = "Departure: " + departureTime;
+            departureBtn.classList.remove('error-highlight');
+            departureBtn.classList.add('recorded');
+            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
+        }
+
+        // Display brief toast confirmation
+        function showToast(text) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = text;
+            toast.classList.add('show');
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
+        // Reset current inputs for next train entry
+        function resetCurrentForm() {
+            trainInput.value = "";
+            trainInput.classList.remove('error-highlight');
+            arrivalTime = "";
+            departureTime = "";
+            
+            arrivalBtn.innerText = "Train Arrival";
+            arrivalBtn.classList.remove('recorded', 'error-highlight');
+            departureBtn.innerText = "Train Departure";
+            departureBtn.classList.remove('recorded', 'error-highlight');
+            document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
+        }
+
+        // Save entry with full validation
+        function saveRecord() {
+            const user = userSelect.value;
+            const trainNo = trainInput.value.trim();
+
+            if (!user) {
+                userSelect.classList.add('error-highlight');
+                userSelect.focus();
+                alert("⚠️ Please select User / Inspector Name first!");
+                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
+                return;
+            }
+
+            if (!trainNo || trainNo.length < 4) {
+                trainInput.classList.add('error-highlight');
+                trainInput.focus();
+                alert("⚠️ Please enter a complete 4-digit Train Number!");
+                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
+                return;
+            }
+
+            if (!arrivalTime) {
+                arrivalBtn.classList.add('error-highlight');
+                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
+                return;
+            }
+
+            if (!departureTime) {
+                departureBtn.classList.add('error-highlight');
+                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
+                return;
+            }
+
+            const newRecord = {
+                date: formattedDate,
+                user: user,
+                trainNumber: trainNo,
+                arrival: arrivalTime,
+                departure: departureTime,
+                timestamp: get24HourTime()
+            };
+
+            savedRecords.push(newRecord);
+            try {
+                localStorage.setItem('train_records', JSON.stringify(savedRecords));
+            } catch(e) {}
+            
+            updateCounter();
+            showToast("✅ Train " + trainNo + " Saved! (" + savedRecords.length + ")");
+            resetCurrentForm();
+        }
+
+        // Generate formatted text report
+        function buildReportText() {
+            let txt = "========================================================================================\n";
+            txt += "                              REGULARITY MEASUREMENT REPORT                              \n";
+            txt += "                              Date: " + formattedDate + " | Total Trains: " + savedRecords.length + "\n";
+            txt += "========================================================================================\n\n";
+            txt += "Date       | Inspector / User                        | Train No | Arrival  | Departure\n";
+            txt += "----------------------------------------------------------------------------------------\n";
+            savedRecords.forEach(function(item) {
+                const d = item.date.padEnd(10, ' ');
+                const u = item.user.padEnd(39, ' ');
+                const t = item.trainNumber.padEnd(8, ' ');
+                const a = item.arrival.padEnd(8, ' ');
+                const dep = item.departure.padEnd(8, ' ');
+                txt += d + " | " + u + " | " + t + " | " + a + " | " + dep + "\n";
+            });
+            txt += "\n========================================================================================\n";
+            return txt;
+        }
+
+        // Export data to TXT file or device share sheet
+        async function exportAllToTxt() {
+            if (savedRecords.length === 0) {
+                alert("⚠️ No saved trains to download yet! Please save at least one train.");
+                return;
+            }
+
+            const reportText = buildReportText();
+            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + "_Report.txt";
+
+            if (navigator.canShare && navigator.share) {
+                try {
+                    const file = new File([reportText], fileName, { type: "text/plain" });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({
+                            files: [file],
+                            title: "Regularity Report",
+                            text: "Regularity Report for " + formattedDate
+                        });
+                        promptReset();
+                        return;
+                    }
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                }
+            }
+
+            try {
+                const encodedData = "data:text/plain;charset=utf-8," + encodeURIComponent(reportText);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedData);
+                link.setAttribute("download", fileName);
+                link.style.display = "none";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                promptReset();
+                return;
+            } catch (err) {
+                console.error("Download error:", err);
+            }
+
+            document.getElementById('reportTextArea').value = reportText;
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function copyReportText() {
+            const ta = document.getElementById('reportTextArea');
+            ta.select();
+            ta.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert("📋 Report text copied to clipboard successfully!");
+        }
+
+        function closeModal() {
+            document.getElementById('reportModal').style.display = 'none';
+            promptReset();
+        }
+
+        function promptReset() {
+            setTimeout(function() {
+                if (confirm("✅ Report exported!\n\nDo you want to clear the saved list to start a new shift?")) {
+                    savedRecords = [];
+                    localStorage.removeItem('train_records');
+                    updateCounter();
+                    resetCurrentForm();
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
+
+```
