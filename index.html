@@ -1,4 +1,4 @@
-```
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -178,12 +178,37 @@
             background-color: #e65100;
         }
 
+        /* Group for clearing actions */
+        .action-row {
+            display: flex;
+            width: 100%;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
         .btn-clear {
-            background-color: #c62828;
+            background-color: #d32f2f;
             color: #ffffff;
             font-size: 14px;
-            padding: 9px 0;
-            width: 60%;
+            padding: 10px 0;
+            flex: 1;
+        }
+
+        .btn-clear:active {
+            background-color: #b71c1c;
+        }
+
+        .btn-clear-all {
+            background-color: #455a64;
+            color: #ffffff;
+            font-size: 13px;
+            padding: 10px 0;
+            flex: 1;
+        }
+
+        .btn-clear-all:active {
+            background-color: #263238;
         }
 
         .counter-badge {
@@ -349,13 +374,18 @@
             <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
             <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
             <button class="btn btn-export" id="btnExport" type="button" onclick="exportAllToTxt()">📥 Download / Share All (TXT)</button>
-            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm()">Clear Form</button>
+            
+            <!-- Clear Actions Row -->
+            <div class="action-row">
+                <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm(true)">🧹 Clear Form</button>
+                <button class="btn btn-clear-all" id="btnClearAll" type="button" onclick="clearAllRecords()">🗑️ Clear All Saved</button>
+            </div>
         </div>
 
         <!-- Footer -->
         <div class="footer">
             <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 82</div>
+            <div>Ver 83</div>
         </div>
     </div>
 
@@ -459,18 +489,46 @@
             }, 2000);
         }
 
-        // Reset current inputs for next train entry
-        function resetCurrentForm() {
+        // Reset current inputs
+        // clearUser = true (when clicking Clear Form): empties inspector dropdown as well
+        // clearUser = false (after Save Train): keeps inspector name for convenience
+        function resetCurrentForm(clearUser = false) {
             trainInput.value = "";
             trainInput.classList.remove('error-highlight');
             arrivalTime = "";
             departureTime = "";
-            
+
             arrivalBtn.innerText = "Train Arrival";
             arrivalBtn.classList.remove('recorded', 'error-highlight');
             departureBtn.innerText = "Train Departure";
             departureBtn.classList.remove('recorded', 'error-highlight');
-            document.getElementById('statusMessage').innerText = "Enter Train Number & Tap Buttons...";
+
+            if (clearUser) {
+                userSelect.selectedIndex = 0;
+                userSelect.classList.remove('error-highlight');
+                localStorage.removeItem('selected_user');
+                showToast("🧹 Form Cleared!");
+                document.getElementById('statusMessage').innerText = "Form cleared. Select user & enter train...";
+            } else {
+                document.getElementById('statusMessage').innerText = "Train saved! Enter next train number...";
+            }
+        }
+
+        // Clear all saved train records (Reset Shift)
+        function clearAllRecords() {
+            if (savedRecords.length === 0) {
+                alert("ℹ️ There are no saved trains to clear.");
+                return;
+            }
+
+            if (confirm("⚠️ Are you sure you want to delete ALL " + savedRecords.length + " saved trains? This cannot be undone.")) {
+                savedRecords = [];
+                localStorage.removeItem('train_records');
+                updateCounter();
+                resetCurrentForm(false);
+                showToast("🗑️ All Records Cleared!");
+                document.getElementById('statusMessage').innerText = "All records cleared for new shift.";
+            }
         }
 
         // Save entry with full validation
@@ -521,10 +579,11 @@
             try {
                 localStorage.setItem('train_records', JSON.stringify(savedRecords));
             } catch(e) {}
-            
+
             updateCounter();
             showToast("✅ Train " + trainNo + " Saved! (" + savedRecords.length + ")");
-            resetCurrentForm();
+            // Keep inspector name for next train
+            resetCurrentForm(false);
         }
 
         // Generate formatted text report
@@ -612,12 +671,11 @@
                     savedRecords = [];
                     localStorage.removeItem('train_records');
                     updateCounter();
-                    resetCurrentForm();
+                    resetCurrentForm(false);
                 }
             }, 500);
         }
     </script>
 </body>
 </html>
-
 ```
