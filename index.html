@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Regularity Measurement</title>
+    <!-- مكتبة التقاط صور الشاشة تلقائياً -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
             --bg-color: #005a79;
@@ -21,7 +23,7 @@
             color: var(--text-color);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
         }
 
@@ -29,7 +31,7 @@
             width: 100%;
             max-width: 412px;
             min-height: 100vh;
-            padding: 20px 24px;
+            padding: 12px 18px 20px 18px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -43,45 +45,45 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            margin-top: 5px;
+            gap: 4px;
+            margin-top: 2px;
             width: 100%;
         }
 
         .header-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: bold;
             text-align: center;
             letter-spacing: 0.5px;
         }
 
         .date-display {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.9);
-            background: rgba(0, 0, 0, 0.2);
-            padding: 4px 14px;
-            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 3px 14px;
+            border-radius: 18px;
         }
 
         .content {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 15px;
+            margin-top: 10px;
             flex-grow: 1;
-            justify-content: center;
-            gap: 12px;
+            justify-content: flex-start;
+            gap: 10px;
             width: 100%;
         }
 
         /* User selection dropdown */
         .select-field {
             width: 100%;
-            padding: 13px;
+            padding: 12px;
             font-size: 16px;
             border: 2px solid transparent;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
@@ -95,10 +97,10 @@
         /* Train number input */
         .input-field {
             width: 100%;
-            padding: 12px;
+            padding: 10px;
             font-size: 26px;
             border: 2px solid transparent;
-            border-radius: 6px;
+            border-radius: 8px;
             text-align: center;
             box-sizing: border-box;
             background-color: #ffffff;
@@ -122,8 +124,8 @@
             background-color: var(--btn-bg);
             color: var(--btn-text);
             border: 2px solid transparent;
-            border-radius: 6px;
-            padding: 14px 0;
+            border-radius: 8px;
+            padding: 13px 0;
             font-size: 18px;
             font-weight: bold;
             cursor: pointer;
@@ -161,7 +163,7 @@
         .btn-submit {
             background-color: #2e7d32;
             color: #ffffff;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         .btn-submit:active {
@@ -172,8 +174,8 @@
         .btn-download-share {
             background: linear-gradient(135deg, #ff9100 0%, #e65100 100%);
             color: #ffffff;
-            font-size: 18px;
-            padding: 15px 0;
+            font-size: 17px;
+            padding: 13px 0;
             box-shadow: 0 4px 15px rgba(230, 81, 0, 0.45);
             border: 1px solid rgba(255, 255, 255, 0.2);
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
@@ -182,7 +184,6 @@
 
         .btn-download-share:active {
             background: linear-gradient(135deg, #e65100 0%, #bf360c 100%);
-            box-shadow: 0 2px 8px rgba(230, 81, 0, 0.35);
             transform: scale(0.98);
         }
 
@@ -199,24 +200,16 @@
             background-color: #d32f2f;
             color: #ffffff;
             font-size: 14px;
-            padding: 10px 0;
+            padding: 9px 0;
             flex: 1;
-        }
-
-        .btn-clear:active {
-            background-color: #b71c1c;
         }
 
         .btn-clear-all {
             background-color: #455a64;
             color: #ffffff;
             font-size: 13px;
-            padding: 10px 0;
+            padding: 9px 0;
             flex: 1;
-        }
-
-        .btn-clear-all:active {
-            background-color: #263238;
         }
 
         .counter-badge {
@@ -226,7 +219,7 @@
             font-size: 13px;
             font-weight: bold;
             color: #ffd54f;
-            margin-bottom: 2px;
+            margin: 2px 0;
         }
 
         .footer {
@@ -235,7 +228,7 @@
             align-items: center;
             font-size: 13px;
             color: rgba(255, 255, 255, 0.85);
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         .status-msg {
@@ -257,7 +250,7 @@
             padding: 12px 24px;
             border-radius: 30px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -266,6 +259,8 @@
             transition: all 0.4s ease;
             z-index: 1000;
             pointer-events: none;
+            text-align: center;
+            max-width: 90%;
         }
 
         .toast.show {
@@ -276,327 +271,402 @@
 </head>
 <body>
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="header-title">Regularity Measurement</div>
-            <div class="date-display" id="currentDate"></div>
-        </div>
+<div class="container" id="appContainer">
+    <!-- Header -->
+    <div class="header">
+        <div class="header-title">Regularity Measurement</div>
+        <div class="date-display" id="currentDate"></div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="content">
-            <!-- Inspector / User Dropdown -->
-            <select id="userSelect" class="select-field">
-                <option value="" disabled selected>👤 Select User / Inspector Name</option>
-                <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
-                <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
-                <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
-                <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
-                <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
-                <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
-                <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
-                <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
-                <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
-                <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
-                <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
-                <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
-                <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
-            </select>
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Inspector / User Dropdown -->
+        <select id="userSelect" class="select-field">
+            <option value="" disabled selected>👤 Select User / Inspector Name</option>
+            <option value="Fathy Helmy Fattouh Hassan">Fathy Helmy Fattouh Hassan</option>
+            <option value="Karim Gamal Salah Al-Din">Karim Gamal Salah Al-Din</option>
+            <option value="Karim Moustafa Mostafa">Karim Moustafa Mostafa</option>
+            <option value="Khaled Mostafa Abdel Moneim">Khaled Mostafa Abdel Moneim</option>
+            <option value="Mohamed El-Sayed Ibrahim">Mohamed El-Sayed Ibrahim</option>
+            <option value="Shorouk Tarek Taha Yaseen">Shorouk Tarek Taha Yaseen</option>
+            <option value="Mahmoud Taher Mahmoud Zaki">Mahmoud Taher Mahmoud Zaki</option>
+            <option value="Ehab Abdel Kareem">Ehab Abdel Kareem</option>
+            <option value="Nancy Hesham Hassan Abdelrehim">Nancy Hesham Hassan Abdelrehim</option>
+            <option value="Nourhan Karam Hanafy Mohamdy">Nourhan Karam Hanafy Mohamdy</option>
+            <option value="Mohamed Emad Imam Mahmoud">Mohamed Emad Imam Mahmoud</option>
+            <option value="Ehab Shabaan Fahmy Elsayed">Ehab Shabaan Fahmy Elsayed</option>
+            <option value="Yasmine Mohamed Alsayed Abdelsattar Akila">Yasmine Mohamed Alsayed Abdelsattar Akila</option>
+        </select>
 
-            <!-- Train Number Input -->
-            <input 
-                type="tel" 
-                id="trainNumber" 
-                class="input-field" 
-                placeholder="🚆 Train Number (4 digits)" 
-                maxlength="4" 
-                inputmode="numeric" 
-                pattern="[0-9]*" 
-                autocomplete="off"
-            />
+        <!-- Train Number Input -->
+        <input 
+            type="tel" 
+            id="trainNumber" 
+            class="input-field" 
+            placeholder="🚆 Train Number (4 digits)" 
+            maxlength="4" 
+            inputmode="numeric" 
+            pattern="[0-9]*" 
+            autocomplete="off"
+        />
 
-            <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
+        <div class="counter-badge" id="trainCounter">Saved Trains: 0</div>
 
-            <!-- Action Buttons -->
-            <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
-            <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
-            <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
+        <!-- Action Buttons -->
+        <button class="btn" id="btnArrival" type="button" onclick="handleArrival()">Train Arrival</button>
+        <button class="btn" id="btnDeparture" type="button" onclick="handleDeparture()">Train Departure</button>
+        <button class="btn btn-submit" id="btnSubmit" type="button" onclick="saveRecord()">💾 Save Train</button>
 
-            <!-- Distinctive Single Download & Share Button (Excel CSV) -->
-            <button class="btn btn-download-share" id="btnExportCsv" type="button" onclick="exportAndShareExcel()">📥 Download / Share All (Excel)</button>
+        <!-- Distinctive Single Download & Share Button (Excel CSV) -->
+        <button class="btn btn-download-share" id="btnExportCsv" type="button" onclick="exportAndShareExcel()">📥 Download / Share All (Excel)</button>
 
-            <!-- Clear Actions Row -->
-            <div class="action-row">
-                <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm(true)">🧹 Clear Form</button>
-                <button class="btn btn-clear-all" id="btnClearAll" type="button" onclick="clearAllRecords()">🗑️ Clear All Saved</button>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="footer">
-            <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
-            <div>Ver 88</div>
+        <!-- Clear Actions Row -->
+        <div class="action-row">
+            <button class="btn btn-clear" id="btnClear" type="button" onclick="resetCurrentForm(true)">🧹 Clear Form</button>
+            <button class="btn btn-clear-all" id="btnClearAll" type="button" onclick="clearAllRecords()">🗑️ Clear All Saved</button>
         </div>
     </div>
 
-    <!-- Quick Toast Notification -->
-    <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
+    <!-- Footer -->
+    <div class="footer">
+        <div class="status-msg" id="statusMessage">Enter details & tap buttons...</div>
+        <div>Ver 89</div>
+    </div>
+</div>
 
-    <script>
-        // Set today's date
-        const today = new Date();
-        const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
-        document.getElementById('currentDate').innerText = formattedDate;
+<!-- Quick Toast Notification -->
+<div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
-        let arrivalTime = "";
-        let departureTime = "";
-        let savedRecords = [];
+<script>
+    // Set today's date
+    const today = new Date();
+    const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+    document.getElementById('currentDate').innerText = formattedDate;
 
-        // Retrieve existing records from browser storage
-        try {
-            savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
-        } catch(e) {
-            savedRecords = [];
-        }
+    let arrivalTime = "";
+    let departureTime = "";
+    let savedRecords = [];
 
-        const userSelect = document.getElementById('userSelect');
-        const trainInput = document.getElementById('trainNumber');
-        const arrivalBtn = document.getElementById('btnArrival');
-        const departureBtn = document.getElementById('btnDeparture');
+    // Retrieve existing records from browser storage
+    try {
+        savedRecords = JSON.parse(localStorage.getItem('train_records') || '[]');
+    } catch(e) {
+        savedRecords = [];
+    }
 
-        // Restore previously selected user name
-        const savedUser = localStorage.getItem('selected_user') || '';
-        if (savedUser) {
-            userSelect.value = savedUser;
-        }
+    const userSelect = document.getElementById('userSelect');
+    const trainInput = document.getElementById('trainNumber');
+    const arrivalBtn = document.getElementById('btnArrival');
+    const departureBtn = document.getElementById('btnDeparture');
 
-        userSelect.addEventListener('change', function() {
-            this.classList.remove('error-highlight');
-            localStorage.setItem('selected_user', this.value);
-        });
+    // Restore previously selected user name
+    const savedUser = localStorage.getItem('selected_user') || '';
+    if (savedUser) {
+        userSelect.value = savedUser;
+    }
 
-        function updateCounter() {
-            document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
-        }
-        updateCounter();
+    userSelect.addEventListener('change', function() {
+        this.classList.remove('error-highlight');
+        localStorage.setItem('selected_user', this.value);
+    });
 
-        // Allow numbers only for train number
-        trainInput.addEventListener('input', function() {
-            this.classList.remove('error-highlight');
-            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
-            const val = this.value.trim();
-            if (val.length > 0) {
-                document.getElementById('statusMessage').innerText = "Train " + val + " entered. Tap 'Train Arrival' next.";
-            } else {
-                document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
-            }
-        });
+    function updateCounter() {
+        document.getElementById('trainCounter').innerText = "Saved Trains: " + savedRecords.length;
+    }
+    updateCounter();
 
-        // 24-hour time formatting (HH:MM:SS)
-        function get24HourTime() {
-            const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            return h + ':' + m + ':' + s;
-        }
+    // Focus handler: automatically scroll into view smoothly
+    trainInput.addEventListener('focus', function() {
+        setTimeout(function() {
+            arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 200);
+    });
 
-        // Log arrival time
-        function handleArrival() {
-            arrivalTime = get24HourTime();
-            arrivalBtn.innerText = "Arrival: " + arrivalTime;
-            arrivalBtn.classList.remove('error-highlight');
-            arrivalBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
-        }
+    // Auto-detect 4 digits, dismiss keyboard, and reveal next button
+    trainInput.addEventListener('input', function() {
+        this.classList.remove('error-highlight');
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+        const val = this.value.trim();
 
-        // Log departure time
-        function handleDeparture() {
-            departureTime = get24HourTime();
-            departureBtn.innerText = "Departure: " + departureTime;
-            departureBtn.classList.remove('error-highlight');
-            departureBtn.classList.add('recorded');
-            document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
-        }
-
-        // Display brief toast confirmation
-        function showToast(text) {
-            const toast = document.getElementById('toastMessage');
-            toast.innerText = text;
-            toast.classList.add('show');
+        if (val.length === 4) {
+            document.getElementById('statusMessage').innerText = "Train " + val + " ready. Tap 'Train Arrival'.";
+            // Close mobile keyboard automatically
+            this.blur();
+            // Scroll smoothly to make the arrival button centered
             setTimeout(function() {
-                toast.classList.remove('show');
-            }, 2000);
+                arrivalBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        } else if (val.length > 0) {
+            document.getElementById('statusMessage').innerText = "Train " + val + " entered. (" + val.length + "/4)";
+        } else {
+            document.getElementById('statusMessage').innerText = "Enter details & tap buttons...";
+        }
+    });
+
+    // 24-hour time formatting (HH:MM:SS)
+    function get24HourTime() {
+        const now = new Date();
+        const h = String(now.getHours()).padStart(2, '0');
+        const m = String(now.getMinutes()).padStart(2, '0');
+        const s = String(now.getSeconds()).padStart(2, '0');
+        return h + ':' + m + ':' + s;
+    }
+
+    // Log arrival time
+    function handleArrival() {
+        arrivalTime = get24HourTime();
+        arrivalBtn.innerText = "Arrival: " + arrivalTime;
+        arrivalBtn.classList.remove('error-highlight');
+        arrivalBtn.classList.add('recorded');
+        document.getElementById('statusMessage').innerText = "Arrival logged at " + arrivalTime + ". Tap 'Train Departure' next.";
+        departureBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Log departure time
+    function handleDeparture() {
+        departureTime = get24HourTime();
+        departureBtn.innerText = "Departure: " + departureTime;
+        departureBtn.classList.remove('error-highlight');
+        departureBtn.classList.add('recorded');
+        document.getElementById('statusMessage').innerText = "Departure logged at " + departureTime + ". Tap 'Save Train' to save.";
+        document.getElementById('btnSubmit').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    // Display brief toast confirmation
+    function showToast(text) {
+        const toast = document.getElementById('toastMessage');
+        toast.innerText = text;
+        toast.classList.add('show');
+        setTimeout(function() {
+            toast.classList.remove('show');
+        }, 2500);
+    }
+
+    // Reset current inputs
+    function resetCurrentForm(clearUser = false) {
+        trainInput.value = "";
+        trainInput.classList.remove('error-highlight');
+        arrivalTime = "";
+        departureTime = "";
+
+        arrivalBtn.innerText = "Train Arrival";
+        arrivalBtn.classList.remove('recorded', 'error-highlight');
+        departureBtn.innerText = "Train Departure";
+        departureBtn.classList.remove('recorded', 'error-highlight');
+
+        if (clearUser) {
+            userSelect.selectedIndex = 0;
+            userSelect.classList.remove('error-highlight');
+            localStorage.removeItem('selected_user');
+            showToast("🧹 Form Cleared!");
+            document.getElementById('statusMessage').innerText = "Form cleared. Select user & enter train...";
+        } else {
+            document.getElementById('statusMessage').innerText = "Train saved! Enter next train number...";
+        }
+    }
+
+    // Clear all saved train records (Reset Shift)
+    function clearAllRecords() {
+        if (savedRecords.length === 0) {
+            alert("ℹ️ There are no saved trains to clear.");
+            return;
         }
 
-        // Reset current inputs
-        function resetCurrentForm(clearUser = false) {
-            trainInput.value = "";
-            trainInput.classList.remove('error-highlight');
-            arrivalTime = "";
-            departureTime = "";
+        if (confirm("⚠️ Are you sure you want to delete ALL " + savedRecords.length + " saved trains? This cannot be undone.")) {
+            savedRecords = [];
+            localStorage.removeItem('train_records');
+            updateCounter();
+            resetCurrentForm(false);
+            showToast("🗑️ All Records Cleared!");
+            document.getElementById('statusMessage').innerText = "All records cleared for new shift.";
+        }
+    }
 
-            arrivalBtn.innerText = "Train Arrival";
-            arrivalBtn.classList.remove('recorded', 'error-highlight');
-            departureBtn.innerText = "Train Departure";
-            departureBtn.classList.remove('recorded', 'error-highlight');
+    // Take automatic screenshot of the app and save/share as PNG image
+    async function captureAndSaveScreenshot(trainNo) {
+        if (typeof html2canvas === 'undefined') return;
+        try {
+            const container = document.getElementById('appContainer');
+            const canvas = await html2canvas(container, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#005a79'
+            });
 
-            if (clearUser) {
-                userSelect.selectedIndex = 0;
-                userSelect.classList.remove('error-highlight');
-                localStorage.removeItem('selected_user');
-                showToast("🧹 Form Cleared!");
-                document.getElementById('statusMessage').innerText = "Form cleared. Select user & enter train...";
-            } else {
-                document.getElementById('statusMessage').innerText = "Train saved! Enter next train number...";
+            const fileName = "Train_" + trainNo + "_" + formattedDate.replace(/\//g, '-') + "_" + arrivalTime.replace(/:/g, '') + ".png";
+
+            canvas.toBlob(async function(blob) {
+                if (!blob) return;
+
+                // 1. Mobile Share (Allows instant save to Photos gallery or send via WhatsApp)
+                if (navigator.canShare && window.File) {
+                    try {
+                        const file = new File([blob], fileName, { type: 'image/png' });
+                        if (navigator.canShare({ files: [file] })) {
+                            await navigator.share({
+                                files: [file],
+                                title: "Train " + trainNo + " Record",
+                                text: "Regularity Measurement screenshot for train " + trainNo
+                            });
+                            return;
+                        }
+                    } catch (e) {
+                        if (e.name === 'AbortError') return;
+                    }
+                }
+
+                // 2. Direct automatic image download to phone Downloads folder
+                const link = document.createElement('a');
+                link.download = fileName;
+                link.href = URL.createObjectURL(blob);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(function() {
+                    URL.revokeObjectURL(link.href);
+                }, 1000);
+            }, 'image/png');
+        } catch (err) {
+            console.error("Screenshot error:", err);
+        }
+    }
+
+    // Save entry with full validation and take instant screenshot
+    async function saveRecord() {
+        const user = userSelect.value;
+        const trainNo = trainInput.value.trim();
+
+        if (!user) {
+            userSelect.classList.add('error-highlight');
+            userSelect.focus();
+            alert("⚠️ Please select User / Inspector Name first!");
+            document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
+            return;
+        }
+
+        if (!trainNo || trainNo.length < 4) {
+            trainInput.classList.add('error-highlight');
+            trainInput.focus();
+            alert("⚠️ Please enter a complete 4-digit Train Number!");
+            document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
+            return;
+        }
+
+        if (!arrivalTime) {
+            arrivalBtn.classList.add('error-highlight');
+            alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
+            document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
+            return;
+        }
+
+        if (!departureTime) {
+            departureBtn.classList.add('error-highlight');
+            alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
+            document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
+            return;
+        }
+
+        const newRecord = {
+            date: formattedDate,
+            user: user,
+            trainNumber: trainNo,
+            arrival: arrivalTime,
+            departure: departureTime,
+            timestamp: get24HourTime()
+        };
+
+        savedRecords.push(newRecord);
+        try {
+            localStorage.setItem('train_records', JSON.stringify(savedRecords));
+        } catch(e) {}
+
+        updateCounter();
+        showToast("📸 Train " + trainNo + " Saved & Photo Captured!");
+
+        // Take screenshot of the screen with all details filled
+        await captureAndSaveScreenshot(trainNo);
+
+        // Reset form for next train after brief moment to capture screenshot
+        setTimeout(function() {
+            resetCurrentForm(false);
+        }, 600);
+    }
+
+    // Unified Download & Share function for Microsoft Excel (.csv)
+    async function exportAndShareExcel() {
+        if (savedRecords.length === 0) {
+            alert("⚠️ No saved trains to export! Please save at least one train.");
+            return;
+        }
+
+        // UTF-8 BOM (\uFEFF) ensures Excel opens Arabic characters & headers accurately
+        let csvContent = "\uFEFF";
+        csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
+
+        savedRecords.forEach(function(item) {
+            const userSafe = '"' + (item.user || '').replace(/"/g, '""') + '"';
+            const row = [
+                `"${item.date}"`,
+                userSafe,
+                `"${item.trainNumber}"`,
+                `"${item.arrival}"`,
+                `"${item.departure}"`,
+                `"${item.timestamp || ''}"`
+            ].join(",");
+            csvContent += row + "\n";
+        });
+
+        const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+
+        // 1. Mobile & Web Share Sheet
+        if (navigator.canShare && navigator.share) {
+            try {
+                const file = new File([blob], fileName, { type: "text/csv" });
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: "Regularity Excel Report",
+                        text: "Regularity Excel Data for " + formattedDate
+                    });
+                    promptReset();
+                    return;
+                }
+            } catch(e) {
+                if (e.name === 'AbortError') return;
             }
         }
 
-        // Clear all saved train records (Reset Shift)
-        function clearAllRecords() {
-            if (savedRecords.length === 0) {
-                alert("ℹ️ There are no saved trains to clear.");
-                return;
-            }
+        // 2. Direct Browser File Download
+        try {
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast("📥 Excel File Downloaded!");
+            promptReset();
+        } catch (err) {
+            console.error("Download error:", err);
+            alert("Download failed. Please check browser permissions.");
+        }
+    }
 
-            if (confirm("⚠️ Are you sure you want to delete ALL " + savedRecords.length + " saved trains? This cannot be undone.")) {
+    function promptReset() {
+        setTimeout(function() {
+            if (confirm("✅ Excel file exported successfully!\n\nDo you want to clear the saved list to start a new shift?")) {
                 savedRecords = [];
                 localStorage.removeItem('train_records');
                 updateCounter();
                 resetCurrentForm(false);
-                showToast("🗑️ All Records Cleared!");
-                document.getElementById('statusMessage').innerText = "All records cleared for new shift.";
             }
-        }
+        }, 500);
+    }
+</script>
 
-        // Save entry with full validation
-        function saveRecord() {
-            const user = userSelect.value;
-            const trainNo = trainInput.value.trim();
-
-            if (!user) {
-                userSelect.classList.add('error-highlight');
-                userSelect.focus();
-                alert("⚠️ Please select User / Inspector Name first!");
-                document.getElementById('statusMessage').innerText = "⚠️ User Name is required!";
-                return;
-            }
-
-            if (!trainNo || trainNo.length < 4) {
-                trainInput.classList.add('error-highlight');
-                trainInput.focus();
-                alert("⚠️ Please enter a complete 4-digit Train Number!");
-                document.getElementById('statusMessage').innerText = "⚠️ Train Number must be 4 digits!";
-                return;
-            }
-
-            if (!arrivalTime) {
-                arrivalBtn.classList.add('error-highlight');
-                alert("⚠️ Train Arrival time is missing! Please tap 'Train Arrival'.");
-                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Arrival time!";
-                return;
-            }
-
-            if (!departureTime) {
-                departureBtn.classList.add('error-highlight');
-                alert("⚠️ Train Departure time is missing! Please tap 'Train Departure'.");
-                document.getElementById('statusMessage').innerText = "⚠️ Please record Train Departure time!";
-                return;
-            }
-
-            const newRecord = {
-                date: formattedDate,
-                user: user,
-                trainNumber: trainNo,
-                arrival: arrivalTime,
-                departure: departureTime,
-                timestamp: get24HourTime()
-            };
-
-            savedRecords.push(newRecord);
-            try {
-                localStorage.setItem('train_records', JSON.stringify(savedRecords));
-            } catch(e) {}
-
-            updateCounter();
-            showToast("✅ Train " + trainNo + " Saved! (" + savedRecords.length + ")");
-            resetCurrentForm(false);
-        }
-
-        // Unified Download & Share function for Microsoft Excel (.csv)
-        async function exportAndShareExcel() {
-            if (savedRecords.length === 0) {
-                alert("⚠️ No saved trains to export! Please save at least one train.");
-                return;
-            }
-
-            // UTF-8 BOM (\uFEFF) ensures Excel opens Arabic characters & headers accurately
-            let csvContent = "\uFEFF";
-            csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
-
-            savedRecords.forEach(function(item) {
-                const userSafe = '"' + (item.user || '').replace(/"/g, '""') + '"';
-                const row = [
-                    `"${item.date}"`,
-                    userSafe,
-                    `"${item.trainNumber}"`,
-                    `"${item.arrival}"`,
-                    `"${item.departure}"`,
-                    `"${item.timestamp || ''}"`
-                ].join(",");
-                csvContent += row + "\n";
-            });
-
-            const fileName = "Regularity_" + formattedDate.replace(/\//g, '-') + ".csv";
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-            // 1. Mobile & Web Share Sheet (WhatsApp, Mail, Save to Files, etc.)
-            if (navigator.canShare && navigator.share) {
-                try {
-                    const file = new File([blob], fileName, { type: "text/csv" });
-                    if (navigator.canShare({ files: [file] })) {
-                        await navigator.share({
-                            files: [file],
-                            title: "Regularity Excel Report",
-                            text: "Regularity Excel Data for " + formattedDate
-                        });
-                        promptReset();
-                        return;
-                    }
-                } catch(e) {
-                    if (e.name === 'AbortError') return;
-                }
-            }
-
-            // 2. Direct Browser File Download (Desktop / fallback)
-            try {
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", fileName);
-                link.style.display = "none";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-                showToast("📥 Excel File Downloaded!");
-                promptReset();
-            } catch (err) {
-                console.error("Download error:", err);
-                alert("Download failed. Please check browser permissions.");
-            }
-        }
-
-        function promptReset() {
-            setTimeout(function() {
-                if (confirm("✅ Excel file exported successfully!\n\nDo you want to clear the saved list to start a new shift?")) {
-                    savedRecords = [];
-                    localStorage.removeItem('train_records');
-                    updateCounter();
-                    resetCurrentForm(false);
-                }
-            }, 500);
-        }
-    </script>
 </body>
 </html>
