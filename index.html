@@ -622,7 +622,7 @@
         }
 
         let csvContent = "\uFEFF";
-        csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time,Logged Timestamp\n";
+        csvContent += "Date,Inspector / User,Train Number,Arrival Time,Departure Time\n";
 
         savedRecords.forEach(function(item) {
             const userSafe = '"' + (item.user || '').replace(/"/g, '""') + '"';
@@ -631,8 +631,7 @@
                 userSafe,
                 `"${item.trainNumber}"`,
                 `"${item.arrival}"`,
-                `"${item.departure}"`,
-                `"${item.timestamp || ''}"`
+                `"${item.departure}"`
             ].join(",");
             csvContent += row + "\n";
         });
