@@ -346,7 +346,7 @@
     <!-- Footer -->
     <div class="footer">
         <div class="status-msg" id="statusMessage">Enter 2 digits & tap buttons...</div>
-        <div>Ver 94</div>
+        <div>Ver 95</div>
     </div>
 </div>
 
@@ -354,9 +354,13 @@
 <div class="toast" id="toastMessage">✅ Train Saved Successfully!</div>
 
 <script>
-    // Set today's date
+    // Set today's date in format: DD-MMM-YYYY (e.g., 20-Feb-2026)
     const today = new Date();
-    const formattedDate = (today.getMonth() + 1) + '/' + today.getDate() + '/' + today.getFullYear();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = months[today.getMonth()];
+    const year = today.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
     document.getElementById('currentDate').innerText = formattedDate;
 
     let arrivalTime = "";
@@ -517,7 +521,6 @@
                     onclone: function(clonedDoc) {
                         const wrapper = clonedDoc.getElementById('trainBoxWrapper');
                         if (wrapper) {
-                            // Replace <input> with a bulletproof styled <div> so no digit or edge ever gets cut
                             wrapper.innerHTML = `
                                 <div style="
                                     width: 100%;
@@ -595,8 +598,7 @@
             user: user,
             trainNumber: trainNo,
             arrival: arrivalTime,
-            departure: departureTime,
-            timestamp: get24HourTime()
+            departure: departureTime
         };
 
         savedRecords.push(newRecord);
